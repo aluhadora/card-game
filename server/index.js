@@ -13,7 +13,7 @@ import RoomState from './roomState.js';
 // app.use(cors());
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
-app.use(express.static(path.resolve(__dirname, '../client/dist')));
+app.use(express.static(path.resolve(__dirname, './client/dist')));
 
 const PORT = process.env.PORT || 3001;
 
@@ -80,7 +80,7 @@ app.get('/api/rooms/:pin', (req, res) => {
 
 // All other GET requests not handled before will return our React app
 app.get('*', (_, res) => {
-    res.sendFile(path.resolve(__dirname, '../client/dist', 'index.html'));
+    res.sendFile(path.resolve(__dirname, './client/dist', 'index.html'));
 });
 
 server.listen(PORT, () => {

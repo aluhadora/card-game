@@ -32,8 +32,9 @@ export default function App() {
     }
 
     const joinGame = (nickname) => {
+        console.log("server url", import.meta.env.VITE_SERVER_URL);
         console.log("Joining game with ID:", gameId);
-        const socket = io('ws://localhost:3001/');
+        const socket = io(import.meta.env.VITE_SERVER_URL || "/");
         socket.on("connect", () => setPlayerId(socket.id));
 
         socket.emit("player-joined", { pin: gameId, nickname: nickname });
