@@ -12,6 +12,7 @@ import RoomState from './roomState.js';
 // app.use(cors());
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
+app.use(express.static(path.resolve(__dirname, '../client/build')));
 
 const PORT = process.env.PORT || 3001;
 
