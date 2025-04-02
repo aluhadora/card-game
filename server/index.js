@@ -5,6 +5,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import http from 'http';
 import path from 'path';
+const __dirname = path.resolve();
 import { Server } from 'socket.io';
 import RoomState from './roomState.js';
 
