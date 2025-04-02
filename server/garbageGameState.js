@@ -81,7 +81,7 @@ export default class GarbageGameState {
 
     scoreCard(cardName) {
         if (!cardName) return 0;
-        if (cardName.score) return cardName.score;
+        if (cardName.score !== undefined) return cardName.score;
 
         if (!cardName) return 0;
 

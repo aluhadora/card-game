@@ -29,40 +29,47 @@ var rooms = {};
 
 io.on('connection', socket => {
 
-    //Player Join Room
-    socket.on('player-joined', (data) => {
-        let room = rooms[data.pin];
-        if (!room) {
-            rooms[data.pin] = new RoomState();
-            room = rooms[data.pin];
-            room.joinHost({ hostId: socket.id, pin: data.pin, roomstate: "Lobby" });
-            console.log(`Host created room ${data.pin} with ID ${socket.id}`);
-        }
-        
-        console.log("Player joining room:", data.pin, "with ID:", socket.id);
-        room.joinPlayer({roomId: data.pin, playerId: socket.id, nickname: data.nickname});
-        socket.join(data.pin);
-        io.to(data.pin).emit('room-joined', { name: data.nickname, id: socket.id, players: room.gameState.players });
-    })
+    try {
+        socket.on('player-joined', (data) => {
+            let room = rooms[data.pin];
+            if (!room) {
+                rooms[data.pin] = new RoomState();
+                room = rooms[data.pin];
+                room.joinHost({ hostId: socket.id, pin: data.pin, roomstate: "Lobby" });
+                console.log(`Host created room ${data.pin} with ID ${socket.id}`);
+            }
 
-    socket.on('start-game', (data) => {
-        if (rooms[data.pin]) {
-            const initialGameState = rooms[data.pin].startGame();
-            io.to(data.pin).emit('game-started', initialGameState);
-            socket.to(data.pin).emit('game-started', initialGameState);
-            console.log(`Game started in room ${data.pin}`);
-        } else {
-            console.error(`Room ${data.pin} does not exist.`);
-        }
-    });
- 
-    socket.on('player-move', (data) => {
-        const delta = rooms[data.pin].playerMove({
-            playerId: socket.id,
-            ...data
+            console.log("Player joining room:", data.pin, "with ID:", socket.id);
+            room.joinPlayer({ roomId: data.pin, playerId: socket.id, nickname: data.nickname });
+            socket.join(data.pin);
+            io.to(data.pin).emit('room-joined', { name: data.nickname, id: socket.id, players: room.gameState.players });
+        })
+
+        socket.on('start-game', (data) => {
+            if (rooms[data.pin]) {
+                const initialGameState = rooms[data.pin].startGame();
+                io.to(data.pin).emit('game-started', initialGameState);
+                socket.to(data.pin).emit('game-started', initialGameState);
+                console.log(`Game started in room ${data.pin}`);
+            } else {
+                console.error(`Room ${data.pin} does not exist.`);
+            }
         });
-        io.to(`${data.pin}`).emit('player-move', {...data, ...delta })
-    });
+
+        socket.on('player-move', (data) => {
+            const delta = rooms[data.pin].playerMove({
+                playerId: socket.id,
+                ...data
+            });
+            io.to(`${data.pin}`).emit('player-move', { ...data, ...delta })
+        });
+    } catch (error) {
+        console.error("Error in socket connection:", error);
+        socket.emit('error', { message: "An error occurred while connecting.", error });
+        return;
+    }
+    //Player Join Room
+
 });
 
 app.get('/api/rooms/:pin', (req, res) => {
