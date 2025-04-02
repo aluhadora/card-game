@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server/index.js",
-    "build": "cd client && npm install && npm run build"
+    "build": "cd client && npm install && vite build"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +16,9 @@
     "express": "^4.18.2",
     "nodemon": "^3.0.3",
     "socket.io": "^4.7.4",
-    "vite": "^6.2.4"
+    "vite": "^6.2.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "socket.io-client": "^4.8.1"
   }
 }
