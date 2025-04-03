@@ -88,7 +88,6 @@ button:focus-visible {
   display: block;
   flex-direction: row;
   align-items: center;
-  color: #000;
 }
 
 .card {

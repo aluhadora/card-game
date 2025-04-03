@@ -37,6 +37,7 @@ function StartedHeader({ gameId, nickname }) {
 function LobbyHeader({ gameId, players, startGame, nickname }) {
     console.log("Players:", players);
     console.log("Players[0]:", players[0]);
+    const url = `https://card-game-494d77369b6f.herokuapp.com/?pin=${gameId}`
     if (!players || !players.length) return <div>Loading...</div>;
 
     return <div>
@@ -46,7 +47,10 @@ function LobbyHeader({ gameId, players, startGame, nickname }) {
         ))}
         <button onClick={startGame}>Start Game</button>
         <div>
-            <QRCodeSVG value={`https://card-game-494d77369b6f.herokuapp.com/?pin=${gameId}`} />
+            <h3>Share this Game ID:</h3>
+            <input type="text" value={url} readOnly style={{ width: "200px" }} />
+            <p>Scan the QR code to join:</p>
+            <QRCodeSVG value={url}/>
         </div>
     </div>
 }
