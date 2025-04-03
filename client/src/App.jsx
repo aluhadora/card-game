@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState } from 'react';
 import './App.css'
 import io from 'socket.io-client';
 import ConnectionManager from './components/connectionManager';
@@ -6,7 +6,9 @@ import Golf from './components/golf/golf';
 
 export default function App() {
 
-    const [gameId, setGameId ] = useState("");
+    const params = new URLSearchParams(window.location.search);
+    const searchTerm = params.get('pin');
+    const [gameId, setGameId ] = useState(searchTerm || ""); 
     const [messages, setMessages] = useState([]);
     const [playerId, setPlayerId] = useState(null);
     const [connected, setConnected] = useState(false);

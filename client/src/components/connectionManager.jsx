@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { QRCodeSVG } from 'qrcode.react';
 
 function InitialHeader({ gameId, setGameId, joinGame, nickname, setNickname }) {
     return <div>
@@ -44,6 +45,9 @@ function LobbyHeader({ gameId, players, startGame, nickname }) {
             <PlayerDisplay player={player} key={index} />
         ))}
         <button onClick={startGame}>Start Game</button>
+        <div>
+            <QRCodeSVG value={`https://card-game-494d77369b6f.herokuapp.com/?pin=${gameId}`} />
+        </div>
     </div>
 }
 
