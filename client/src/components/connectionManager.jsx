@@ -2,6 +2,10 @@ import { useState } from "react";
 import { QRCodeSVG } from 'qrcode.react';
 
 function InitialHeader({ gameId, setGameId, joinGame, nickname, setNickname }) {
+    const [playerId, setPlayerId] = useState(localStorage.getItem("playerId") || crypto.randomUUID());
+    const [playerSecret, setPlayerSecret] = useState(localStorage.getItem("playerSecret") || crypto.randomUUID());
+    
+
     return <div>
         <div>
             <label>
@@ -16,7 +20,19 @@ function InitialHeader({ gameId, setGameId, joinGame, nickname, setNickname }) {
             </label>
         </div>
         <div>
-            <button onClick={() => joinGame(nickname)}>Join Game</button>
+            <label>
+                PlayerId: 
+                <input type='text' placeholder='Enter Player ID' value={playerId} onChange={e => setPlayerId(e.target.value)} />
+            </label>
+        </div>
+        <div>
+            <label>
+                Secret: 
+                <input type='text' placeholder='Enter Secret' value={playerSecret} onChange={e => setPlayerSecret(e.target.value)} />
+            </label>
+        </div>
+        <div>
+            <button onClick={() => joinGame(nickname, playerId, playerSecret)}>Join Game</button>
         </div>
     </div>
 }

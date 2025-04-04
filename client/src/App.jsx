@@ -19,6 +19,12 @@ export default function App() {
 
     const addPlayer = (playerData) => {
         setMessages(messages => [...messages, playerData]);
+        // Check if the player already exists
+        const existingPlayer = players.find(player => player.id === playerData.id);
+        if (existingPlayer) {
+            console.log("Player already exists:", existingPlayer);
+            return; // Player already exists, do not add again
+        }
         setPlayers(players => [...players, playerData]);
     }
 
@@ -33,18 +39,49 @@ export default function App() {
         console.log("Game has started!");
     }
 
-    const joinGame = (nickname) => {
-        console.log("server url", import.meta.env.VITE_SERVER_URL);
-        console.log("Joining game with ID:", gameId);
-        const socket = io(import.meta.env.VITE_SERVER_URL || "/");
-        socket.on("connect", () => setPlayerId(socket.id));
+    const  getRoomState = async () => {
+        const url = `${"http://localhost:3001"}/api/rooms/${gameId}`;
+        console.log("Fetching room state from:", url);
+        
+        const response = await fetch(url);
+        if (!response.ok) {
+            console.log("Failed to fetch room state, response not ok:", response);
+            throw new Error("Room not found or error in fetching state.");
+        }
 
-        socket.emit("player-joined", { pin: gameId, nickname: nickname });
+        const data = await response.json();
+        console.log("roomstate", data);
+        
+        setDeltas([data.gameState]); 
+        console.log("Fetched room state:", data);
+        
+        return data;
+    }
+
+    const joinGame = async (nickname, playerId, playerSecret) => {
+        const serverUrl = import.meta.env.VITE_SERVER_URL || "/";
+        console.log("server url", serverUrl);
+        console.log("Joining game with ID:", gameId);
+
+        
+
+        const socket = io(serverUrl);
+        socket.on("connect", () => setPlayerId(playerId));
+
+        socket.emit("player-joined", { pin: gameId, playerId: playerId, playerSecret: playerSecret, nickname: nickname });
         socket.on('room-joined', data => addPlayer(data));
         socket.on('game-started', gameStarted);
         socket.on('player-move', playerMoved);
         setConnected(true);
         setSocket(socket);
+
+        const state = await getRoomState();
+        if (state && state.roomstate !== "Lobby") {
+            console.log("Game is not in Lobby state, starting game...");
+            setStarted(true);
+        } else {
+            console.log("Game is in Lobby state, waiting for start...", state);
+        }
     }
 
     const playerMoved = delta => {

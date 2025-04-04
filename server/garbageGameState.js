@@ -64,7 +64,7 @@ export default class GarbageGameState {
                 index: null,
             };
         } else {
-            console.warn(`Player ${playerId} is already in the game.`);
+            console.log(`Player ${playerName} is already in the game. and has rejoined`);
         }
     }
 

@@ -5,7 +5,7 @@ import AnimationHandler from "./animationHandler";
 
 function players(gameState, playerId) {
     const players = Object.values(gameState.players);
-    const index = gameState.players[playerId]?.index;
+    const index = gameState.players[playerId]?.index || 0;
 
     return [...players.slice(index), ...players.slice(0, index)];
 }
@@ -16,10 +16,10 @@ export default function Golf({ gameState, playerMove, playerId }) {
     const [animationRefs, setAnimationRefs] = useState({ deckRef: null, discardRef: null });
     
     useEffect(() => {
-        if (gameState && gameState.gameState !== "FirstCard") {
+        if (gameState && gameState.gameState !== "FirstCard" && playerId === gameState.currentPlayerId) {
             setSelectedCard(gameState.discardPile.slice(-1)[0] || null);
         }
-    }, [gameState]);
+    }, [playerId, gameState]);
     
     if (!gameState) return null;
 

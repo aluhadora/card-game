@@ -22,6 +22,13 @@ const io = new Server(server, {
     cors: { origin: "http://localhost:5173", methods: ["GET", "POST"] },
 });
 
+app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*"); // Or your specific origin
+    res.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT"); // Or your allowed methods
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type"); // Or your allowed headers
+    next();
+});
+
 // Have Node serve the files for our built React app
 // app.use(express.static(path.resolve(__dirname, '../client/build')));
 
@@ -35,14 +42,14 @@ io.on('connection', socket => {
             if (!room) {
                 rooms[data.pin] = new RoomState();
                 room = rooms[data.pin];
-                room.joinHost({ hostId: socket.id, pin: data.pin, roomstate: "Lobby" });
+                room.joinHost({ roomId: data.pin, playerId: data.playerId, nickname: data.nickname, socketId: socket.id, playerSecret: data.playerSecret });
                 console.log(`Host created room ${data.pin} with ID ${socket.id}`);
             }
 
-            console.log("Player joining room:", data.pin, "with ID:", socket.id);
-            room.joinPlayer({ roomId: data.pin, playerId: socket.id, nickname: data.nickname });
+            console.log("Player joining room:", data.pin, "with ID:", socket.id, data);
+            room.joinPlayer({ roomId: data.pin, socketId: socket.id, ...data });
             socket.join(data.pin);
-            io.to(data.pin).emit('room-joined', { name: data.nickname, id: socket.id, players: room.gameState.players });
+            io.to(data.pin).emit('room-joined', { name: data.nickname, playerId: data.playerId, players: room.gameState.players });
         })
 
         socket.on('start-game', (data) => {
@@ -61,7 +68,7 @@ io.on('connection', socket => {
                 playerId: socket.id,
                 ...data
             });
-            io.to(`${data.pin}`).emit('player-move', { ...data, ...delta })
+            io.to(data.pin).emit('player-move', { ...data, ...delta })
         });
     } catch (error) {
         console.error("Error in socket connection:", error);
@@ -77,8 +84,11 @@ app.get('/api/rooms/:pin', (req, res) => {
     if (rooms[pin]) {
         res.status(200).json({
             roomstate: rooms[pin].roomstate,
-            players: rooms[pin].players,
-            gameState: rooms[pin].gameState
+            players: rooms[pin].players.map(player => ({
+                id: player.playerId,
+                nickname: player.nickname,
+            })),
+            gameState: rooms[pin].gameState.visibleState()
         });
     } else {
         res.status(404).json({ message: "Room not found" });

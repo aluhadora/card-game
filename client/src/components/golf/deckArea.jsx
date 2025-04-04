@@ -46,7 +46,6 @@ function DiscardPile( { state, playerMove, selectedCard, setSelectedCard, animat
 }
 
 export default function DeckArea({ state, playerMove, playerId, selectedCard, setSelectedCard, animationRefs }) {
-    console.log("DeckArea");
     return <div className="deck-area" style={{ opacity: state.currentPlayerId === playerId ? 1 : 0.5 }}>
         <DeckCard state={state} playerMove={playerMove} playerId={playerId} animationRefs={animationRefs}/><DiscardPile animationRefs={animationRefs} state={state} playerMove={playerMove} selectedCard={selectedCard} setSelectedCard={setSelectedCard}/>
     </div>
