@@ -25,8 +25,7 @@ export default function Golf({ gameState, playerMove, playerId }) {
 
     return (
         <div className="game-board">
-            <h3 onClick={() => setAnimateCard(b => !b)}>Current Player: {gameState.players[gameState.currentPlayerId].nickname}</h3>
-            <h3>State: {gameState.gameState}| Animated: {animateCard ? "Y" : "F"}</h3>
+            {/* <h3>State: {gameState.gameState}| Animated: {animateCard ? "Y" : "F"}</h3> */}
             <DeckArea state={gameState} playerMove={playerMove} playerId={playerId} selectedCard={selectedCard} setSelectedCard={setSelectedCard} animateCard={setAnimateCard} animationRefs={animationRefs}/>
             <div className='players-area'>
                 {players(gameState, playerId).map((player, index) => (

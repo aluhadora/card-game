@@ -41,7 +41,7 @@ function LobbyHeader({ gameId, players, startGame, nickname }) {
     if (!players || !players.length) return <div>Loading...</div>;
 
     return <div>
-        <h2>Connected to Game: {gameId} as {nickname}</h2>
+        <span>Connected to Game: {gameId} as {nickname}</span>
         {Object.values(players[0].players).map((player, index) => (
             <PlayerDisplay player={player} key={index} />
         ))}
