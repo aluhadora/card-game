@@ -39,8 +39,8 @@ export default function App() {
         console.log("Game has started!");
     }
 
-    const  getRoomState = async () => {
-        const url = `${"http://localhost:3001"}/api/rooms/${gameId}`;
+    const getRoomState = async () => {
+        const url = `${import.meta.env.VITE_HTTP_SERVER_URL || "/"}api/rooms/${gameId}`;
         console.log("Fetching room state from:", url);
         
         const response = await fetch(url);
@@ -63,7 +63,9 @@ export default function App() {
         console.log("server url", serverUrl);
         console.log("Joining game with ID:", gameId);
 
-        
+        localStorage.setItem("playerId", playerId);
+        localStorage.setItem("playerSecret", playerSecret);
+        localStorage.setItem("nickname", nickname);
 
         const socket = io(serverUrl);
         socket.on("connect", () => setPlayerId(playerId));

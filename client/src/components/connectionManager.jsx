@@ -77,7 +77,7 @@ function PostConnectionHeader({ gameId, players, startGame, started, nickname })
 }
 
 function Header({ gameId, setGameId, connected, joinGame, players, startGame, started }) {
-    const [nickname, setNickname] = useState("");
+    const [nickname, setNickname] = useState(localStorage.getItem("nickname") || "");
 
     if (!connected) return <InitialHeader gameId={gameId} setGameId={setGameId} joinGame={joinGame} nickname={nickname} setNickname={setNickname} />;
     return <PostConnectionHeader gameId={gameId} players={players} startGame={startGame} started={started} nickname={nickname} />;
