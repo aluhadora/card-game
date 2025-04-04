@@ -69,6 +69,11 @@ io.on('connection', socket => {
                 ...data
             });
             io.to(data.pin).emit('player-move', { ...data, ...delta })
+            if (delta.gameState === "GameOver") {
+                io.to(data.pin).emit('game-over', delta);
+                console.log(`Game over in room ${data.pin}`);
+                rooms[data.pin] = undefined;
+            }
         });
     } catch (error) {
         console.error("Error in socket connection:", error);

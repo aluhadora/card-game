@@ -48,6 +48,7 @@ export default class GarbageGameState {
             gameState: this.gameState,
             players: this.players,
             discardPile: this.discards,
+            remainingCards: this.deck.length() - this.totalUnrevealedCards(),
         };
     }
 
@@ -125,16 +126,33 @@ export default class GarbageGameState {
         currentPlayer.score = score;
     }
 
+    totalUnrevealedCards() {
+        return Object.values(this.players).reduce((acc, player) => {
+            return acc + player.playArea.filter(card => card === null).length;
+        }, 0);
+    }
+
     advancePlayer() {
         const allPlayers = Object.values(this.players);
         const currentPlayer = allPlayers.find(player => player.id === this.currentPlayerId);
         const currentIndex = currentPlayer.index;
         const nextIndex = (currentIndex + 1) % allPlayers.length || 0;
 
-        console.log("NextIndex", nextIndex);
         const nextPlayer = allPlayers.find(player => player.index === nextIndex);
         this.currentPlayerId = nextPlayer.id;
         this.gameState = "FirstCard";
+
+        // If the next player has no cards left, we need to check if the game is over
+        if (nextPlayer.playArea.every(card => card !== null) || this.deck.length() <= this.totalUnrevealedCards()) {
+            this.gameState = "GameOver";
+
+            // Reveal all remaining cards
+            Object.values(this.players).forEach(player => {
+                player.playArea = player.playArea.map(card => card || this.deck.draw()); // Draw new cards for any empty slots
+            });
+            this.recalculateScore(); // Recalculate scores for all players
+            console.log("Game Over! Scores:", this.players);
+        }
     }
 
     playerMove(moveData) {

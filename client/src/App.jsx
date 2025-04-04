@@ -106,5 +106,21 @@ export default function App() {
 }
 
 function GameBoard({playerMove, state, playerId}) {
+    if (!state) {
+        return <div>Loading game state...</div>;
+    }
+    if (state.gameState === "GameOver") {
+        console.log("Game Over state detected", state);
+        return <div>
+            Game Over! Thanks for playing!
+            <br />
+            {Object.values(state.players).map(player => (
+                <div key={player.id}>
+                    {player.nickname}: {player.score} points
+                </div>
+            ))}
+            <Golf gameState={state} playerMove={playerMove} />
+        </div>;
+    }
     return <Golf gameState={state} playerMove={playerMove} playerId={playerId} />
 }

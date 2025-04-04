@@ -14,7 +14,11 @@ function DeckCard({ state, playerMove, playerId, animationRefs }) {
         }
     };
 
-    return <Card cardRef={animationRefs.deckRef} active={state.currentPlayerId === playerId} onClick={cardClick}/>
+    console.log("DeckCard render: ", state.remainingCards, state.currentPlayerId, playerId, active, state);
+    return <div>
+            <Card cardRef={animationRefs.deckRef} active={state.currentPlayerId === playerId} onClick={cardClick}/>
+            {/* <span>Remaining: {state.remainingCards}</span> */}
+        </div>
 }
 
 function DiscardPile( { state, playerMove, selectedCard, setSelectedCard, animationRefs } ) {

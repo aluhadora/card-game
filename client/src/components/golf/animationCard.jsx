@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Card from "../card";
 
-export default function AnimationCard({ card, from, to, duration = 500, onComplete }) {
+export default function AnimationCard({ card, from, to, duration = 250, onComplete }) {
 
     console.log("AnimationCard from", from, "to", to, "duration", duration, "card", card);
 
