@@ -22,9 +22,12 @@ export default function PlayerArea({ player, playerMove, active, isUs, selectedC
     return (
         <div className={"player-area " + (active ? " active" : "")} id={player.id} style={{ opacity: isUs ? 1 : 0.5 }}>
             <div className="player-info">
-                <h2>{player.nickname}</h2>
-                <p>{player.score || 0}</p>
-                {isUs && active && <span>Selected Card: <Card cardRef={animationRefs.selectedCardRef} card={selectedCard} /></span>}
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginRight: "5em" }}>
+                    <h2>Name: {player.nickname}</h2>
+                    <p>Score: {player.score || 0}</p>
+                </div>
+                
+                {isUs && active && <span><Card cardRef={animationRefs.selectedCardRef} card={selectedCard} renderBackForNull={false} />Selected Card</span>}
             </div>
             <div className="player-cards">
                 <table>

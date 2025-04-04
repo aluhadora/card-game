@@ -1,5 +1,5 @@
-export default function Card({ card, onClick, style, className, active, cardRef }) {
-    if (!card) card = {imageName: "back", value: 0};
+export default function Card({ card, onClick, style, className, active, renderBackForNull = true, cardRef }) {
+    if (!card) card = {imageName: renderBackForNull ? "back" : "card-base", value: 0};
     if (card.name) card.imageName = card.name; // For backward compatibility with old card objects  
     if (!card.imageName) {
         card = { imageName: card, value: 0 }; // Fallback for string input

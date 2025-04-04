@@ -128,3 +128,11 @@ button:focus-visible {
   margin-top: 2rem;
   width: 100%;
 }
+
+
+.player-info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 1rem;
+}

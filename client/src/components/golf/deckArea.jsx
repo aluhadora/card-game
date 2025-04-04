@@ -19,7 +19,7 @@ function DeckCard({ state, playerMove, playerId, animationRefs }) {
 
 function DiscardPile( { state, playerMove, selectedCard, setSelectedCard, animationRefs } ) {
 
-    const card = state.discardPile.slice(selectedCard ? -2 : -1)[0]; 
+    let card = state.discardPile.slice(selectedCard ? -2 : -1)[0]; 
 
     const selectDiscard = (e) => {
         const bounds = e.target.getBoundingClientRect();
@@ -38,11 +38,11 @@ function DiscardPile( { state, playerMove, selectedCard, setSelectedCard, animat
 
     
     if (state.discardPile.length === 0 || state.discardPile.length === 1 && selectedCard) {
-        return <div ref={animationRefs.discardRef} onClick={selectDiscard} className="discard-pile empty">No Discards2</div>;
+        card = null;
     }
 
 
-    return <Card className="discard-pile" card={card} onClick={selectDiscard} cardRef={animationRefs.discardRef} />
+    return <Card className="discard-pile" card={card} onClick={selectDiscard} cardRef={animationRefs.discardRef} renderBackForNull={false} />
 }
 
 export default function DeckArea({ state, playerMove, playerId, selectedCard, setSelectedCard, animationRefs }) {
