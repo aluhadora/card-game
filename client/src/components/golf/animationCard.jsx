@@ -9,7 +9,7 @@ export default function AnimationCard({ card, from, to, duration = 500, onComple
     // from = from.current.getBoundingClientRect();
 
     const initialStyle = {
-        position: 'absolute',
+        position: 'fixed',
         left: from?.left,
         top: from?.top,
         transition: `transform ${duration}ms ease-in-out`,
