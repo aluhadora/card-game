@@ -29,7 +29,7 @@ export default function Golf({ gameState, playerMove, playerId }) {
             <DeckArea state={gameState} playerMove={playerMove} playerId={playerId} selectedCard={selectedCard} setSelectedCard={setSelectedCard} animateCard={setAnimateCard} animationRefs={animationRefs}/>
             <div className='players-area'>
                 {players(gameState, playerId).map((player, index) => (
-                    <PlayerArea player={player} key={index} playerMove={playerMove} isUs={player.id === playerId} active={gameState.currentPlayerId === player.id} selectedCard={selectedCard} setSelectedCard={setSelectedCard} gameState={gameState.gameState} animationRefs={animationRefs}/>
+                    <PlayerArea player={player} key={index} playerMove={playerMove} isUs={player.id === playerId} gameState={gameState} active={gameState.currentPlayerId === player.id || gameState.gameState === "Opening"} selectedCard={selectedCard} setSelectedCard={setSelectedCard} gameState={gameState.gameState} animationRefs={animationRefs}/>
                 ))}
             </div>
             <AnimationHandler animateCard={animateCard} setAnimateCard={setAnimateCard} setAnimationRefs={setAnimationRefs} animationRefs={animationRefs} />

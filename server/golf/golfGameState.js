@@ -1,17 +1,26 @@
+import MoveValidator from "./moveValidator.js";
+
 class Deck {
-    constructor() {
+    constructor(numberOfDecks = 1) {
         const cardNames = ["spade_1", "spade_2", "spade_3", "spade_4", "spade_5", "spade_6", "spade_7", "spade_8", "spade_9", "spade_10", "spade_jack", "spade_queen", "spade_king",
             "heart_1", "heart_2", "heart_3", "heart_4", "heart_5", "heart_6", "heart_7", "heart_8", "heart_9", "heart_10", "heart_jack", "heart_queen", "heart_king",
             "club_1", "club_2", "club_3", "club_4", "club_5", "club_6", "club_7", "club_8", "club_9", "club_10", "club_jack", "club_queen", "club_king",
-            "diamond_1", "diamond_2", "diamond_3", "diamond_4", "diamond_5", "diamond_6", "diamond_7", "diamond_8", "diamond_9", "diamond_10", "diamond_jack", "diamond_queen", "diamond_king"
+            "diamond_1", "diamond_2", "diamond_3", "diamond_4", "diamond_5", "diamond_6", "diamond_7", "diamond_8", "diamond_9", "diamond_10", "diamond_jack", "diamond_queen", "diamond_king",
+            "joker_black", "joker_red"
         ];
-        const deck = cardNames.map((name) => ({ name, score: this.scoreCard(name) }));
-        
+
+        const decks = [];
+        for (let i = 0; i < numberOfDecks; i++) {
+            decks.push(...cardNames.map(name => ({ name, score: this.scoreCard(name) })));
+        }
+
         // shuffle the deck
-        this.shuffledDeck = deck.sort(() => Math.random() - 0.5);
+        this.shuffledDeck = decks.sort(() => Math.random() - 0.5);
     }
 
     scoreCard(cardName) {
+        if (cardName.startsWith("joker")) return -2;
+
         const value = cardName.split("_")[1];
         if (value === "jack") {
             return 10;
@@ -33,13 +42,14 @@ class Deck {
     }
 }
 
-export default class GarbageGameState {
+export default class GolfGame {
     constructor() {
         this.players = {};
         this.gameState = "";
         this.currentPlayerId = null;
         this.discards = [];
         this.deck = new Deck(); // Initialize the deck
+        this.moveValidator = new MoveValidator(this);
     }
 
     visibleState() {
@@ -70,7 +80,7 @@ export default class GarbageGameState {
     }
 
     startGame() {
-        this.gameState = "FirstCard";
+        this.gameState = "Opening";
         let index = 0;
         Object.values(this.players).forEach(player => {
             player.index = index++;
@@ -155,11 +165,29 @@ export default class GarbageGameState {
         }
     }
 
-    playerMove(moveData) {
-        if (moveData.playerId !== this.currentPlayerId) {
-            console.error(`It's not player ${moveData.playerId}'s turn! Current player is ${this.currentPlayerId}.`);
-            return this.visibleState(); 
+    openingStatePlayerMove(moveData) {
+        const player = this.players[moveData.playerId];
+        
+        player.playArea[moveData.cardIndex] = this.deck.draw(); // Place the accepted card in the player's play area
+        
+        if (Object.values(this.players).every(player => player.playArea.filter(card => card !== null).length >= 2)) {
+            this.gameState = "FirstCard";
         }
+
+        console.log(`Player ${player.nickname} has accepted a card. Current game state: ${this.gameState}`);
+
+        return this.visibleState();
+    }
+
+    playerMove(moveData) {
+        if (!this.moveValidator.validateMove(moveData)) {
+            console.error("Invalid move data:", moveData);
+            return this.visibleState(); // Return the current state if the move is invalid
+        }
+
+        if (this.gameState === "Opening") {
+            return this.openingStatePlayerMove(moveData); // Handle opening state moves separately
+        }   
 
         const currentPlayer = this.players[this.currentPlayerId];
         if (moveData.acceptCard) {

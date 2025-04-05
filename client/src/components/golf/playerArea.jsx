@@ -1,9 +1,15 @@
 import Card from "../card";
 
-export default function PlayerArea({ player, playerMove, active, isUs, selectedCard, setSelectedCard, animationRefs }) {
+export default function PlayerArea({ player, gameState, playerMove, active, isUs, selectedCard, setSelectedCard, animationRefs }) {
     // 3 by 3 grid of cards
 
     const cardClick = (move, e) => {
+        console.log("Card Clicked: ", move, gameState, active, isUs);
+        if (gameState === "Opening") {
+            playerMove(move); // Accepting the first two cards in opening state
+            return;
+        }
+
         const bounds = e.target.getBoundingClientRect();
         if (!active || !isUs || !selectedCard) return;
 

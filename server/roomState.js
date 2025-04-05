@@ -1,4 +1,4 @@
-import GarbageGameState from "./garbageGameState.js";
+import GolfGame from "./golf/golfGameState.js";
 
 export default class RoomState {
     joinHost(data) {
@@ -6,7 +6,7 @@ export default class RoomState {
         this.roomId = data.pin;
         this.players = []; 
         this.roomstate = "Lobby";
-        this.gameState = new GarbageGameState();
+        this.gameState = new GolfGame();
     }
 
     joinNewPlayer(data) {
