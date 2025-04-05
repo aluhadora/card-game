@@ -58,7 +58,7 @@ function LobbyHeader({ gameId, players, startGame, nickname }) {
 
     return <div>
         <span>Connected to Game: {gameId} as {nickname}</span>
-        {Object.values(players[0].players).map((player, index) => (
+        {Object.values(players.slice(-1)[0].players).map((player, index) => (
             <PlayerDisplay player={player} key={index} />
         ))}
         <button onClick={startGame}>Start Game</button>

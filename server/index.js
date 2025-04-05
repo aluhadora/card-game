@@ -50,6 +50,7 @@ io.on('connection', socket => {
             room.joinPlayer({ roomId: data.pin, socketId: socket.id, ...data });
             socket.join(data.pin);
             io.to(data.pin).emit('room-joined', { name: data.nickname, playerId: data.playerId, players: room.gameState.players });
+            socket.to(data.pin).emit('room-joined', { name: data.nickname, playerId: data.playerId, players: room.gameState.players });
         })
 
         socket.on('start-game', (data) => {
