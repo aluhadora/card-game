@@ -4,18 +4,18 @@ export default class MoveValidator {
     }
 
     validateOpeningStatePlayerMove(moveData) {
-        if (this.gameState !== "Opening") {
+        if (this.golfGame.gameState !== "Opening") {
             return true;
         }
 
-        const player = this.players[moveData.playerId];
+        const player = this.golfGame.players[moveData.playerId];
         if (!player) {
             console.error(`Player ${moveData.playerId} not found!`);
             return false;
         }
 
         // Accept the first two cards drawn by the player
-        if (!moveData.cardIndex || !moveData.acceptCard) {
+        if (!moveData.acceptCard) {
             console.error(`Invalid move data: ${JSON.stringify(moveData)}. Player ${moveData.playerId} must accept the first two cards drawn.`);
             return false;
         }
@@ -25,10 +25,14 @@ export default class MoveValidator {
             return false;
         }
 
+        console.log(`Player ${moveData.playerId} accepted card at index ${moveData.cardIndex}.`);
+        console.log(`Player has ${player.playArea.filter(card => card !== null).length} accepted cards.`);
         if (player.playArea.filter(card => card !== null).length >= 2) {
             console.error(`Player ${moveData.playerId} has already accepted two cards. Cannot accept more.`);
             return false;
         }
+
+        return true;
     }
 
     validatePlayerTurn(moveData) {

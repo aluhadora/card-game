@@ -16,7 +16,7 @@ export default function Golf({ gameState, playerMove, playerId }) {
     const [animationRefs, setAnimationRefs] = useState({ deckRef: null, discardRef: null });
     
     useEffect(() => {
-        if (gameState && gameState.gameState !== "FirstCard" && playerId === gameState.currentPlayerId) {
+        if (gameState && gameState.gameState != "Opening" && gameState.gameState !== "FirstCard" && playerId === gameState.currentPlayerId) {
             setSelectedCard(gameState.discardPile.slice(-1)[0] || null);
         }
     }, [playerId, gameState]);

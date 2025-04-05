@@ -108,8 +108,8 @@ export default class GolfGame {
         }
     }
 
-    recalculateScore() {
-        const currentPlayer = this.players[this.currentPlayerId];
+    recalculateScore(player = null) {
+        const currentPlayer = player || this.players[this.currentPlayerId];
         const hand = currentPlayer.playArea.map(card => this.scoreCard(card));
         
         let score = hand.reduce((acc, card) => {
@@ -175,6 +175,8 @@ export default class GolfGame {
         }
 
         console.log(`Player ${player.nickname} has accepted a card. Current game state: ${this.gameState}`);
+
+        this.recalculateScore(player); // Recalculate score after the move
 
         return this.visibleState();
     }
