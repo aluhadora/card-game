@@ -74,10 +74,11 @@ button:focus-visible {
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  margin: 1rem;
-  padding: 1rem;
+  margin: 0.5rem;
+  padding: 0.75rem;
   width: min-content;
 }
+
 
 .player-area.active {
   border: 2px solid #535bf2;
@@ -97,6 +98,11 @@ button:focus-visible {
   background-color: #535bf2;
   background-size: contain;
   background-repeat: no-repeat;
+}
+
+.card.small {
+  width: 1.4em;
+  height: 2em;
 }
 
 .card.active {
@@ -125,7 +131,7 @@ button:focus-visible {
   align-items: center;
   flex-direction: row;
   gap: 2rem;
-  margin-top: 2rem;
+  margin-top: 0rem;
   width: 100%;
 }
 
@@ -136,3 +142,81 @@ button:focus-visible {
   align-items: center;
   margin-bottom: 1rem;
 }
+
+.game-board {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+}
+
+@media (min-width:320px)  { 
+  body {
+    place-items: baseline;
+  }
+  .player-area {
+    margin: 0;
+    padding: 0;
+  }
+  .player-info {
+    margin-bottom: 0rem;
+  }
+  .deck-area {
+    margin: 2rem;
+  }
+  .card {
+    width:  4.5em !important;
+    height: 6.5em !important;
+    padding: 0 !important;
+  }
+  .card.small {
+    width: 1.4em !important;
+    height: 2em !important;
+  }
+  .game-board {
+    margin-top: 0;
+  }
+  .other-players-area {
+    margin: 1rem;
+  }
+ }
+@media (min-width:481px)  { /* portrait e-readers (Nook/Kindle), smaller tablets @ 600 or @ 640 wide. */ }
+@media (min-width:641px)  { /* portrait tablets, portrait iPad, landscape e-readers, landscape 800x480 or 854x480 phones */ }
+@media (min-width:961px)  {
+  body {
+    place-items: center;
+  }
+  .player-area {
+    margin: 0;
+    padding: 0;
+  }
+  .player-info {
+    margin-bottom: 0rem;
+  }
+  .deck-area {
+    margin: 2rem;
+  }
+  .card {
+    width:  30px !important;
+    height: 71px !important;
+    padding: 2rem !important;
+  }
+  .card.small {
+    width: 2.8em !important;
+    height: 4em !important;
+    padding: 0 !important;
+  }
+  .other-players-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    gap: 1rem;
+    width: 100%;
+    margin: 1rem
+  }
+ }
+@media (min-width:1025px) {
+
+}
+@media (min-width:1281px) { /* hi-res laptops and desktops */ }

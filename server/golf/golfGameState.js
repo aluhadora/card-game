@@ -159,8 +159,8 @@ export default class GolfGame {
             // Reveal all remaining cards
             Object.values(this.players).forEach(player => {
                 player.playArea = player.playArea.map(card => card || this.deck.draw()); // Draw new cards for any empty slots
+                this.recalculateScore(player);
             });
-            this.recalculateScore(); // Recalculate scores for all players
             console.log("Game Over! Scores:", this.players);
         }
     }
@@ -182,6 +182,8 @@ export default class GolfGame {
     }
 
     playerMove(moveData) {
+        console.log("Player move received:", moveData);
+
         if (!this.moveValidator.validateMove(moveData)) {
             console.error("Invalid move data:", moveData);
             return this.visibleState(); // Return the current state if the move is invalid

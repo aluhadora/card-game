@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { QRCodeSVG } from 'qrcode.react';
+import * as uuid from "uuid";
 
 function InitialHeader({ gameId, setGameId, joinGame, nickname, setNickname }) {
-    const [playerId, setPlayerId] = useState(localStorage.getItem("playerId") || crypto.randomUUID());
-    const [playerSecret, setPlayerSecret] = useState(localStorage.getItem("playerSecret") || crypto.randomUUID());
+    const [playerId, setPlayerId] = useState(localStorage.getItem("playerId") || uuid.v4()); // Use uuid.v4() for generating a new player ID if not present
+    const [playerSecret, setPlayerSecret] = useState(localStorage.getItem("playerSecret") || uuid.v4()); // Use uuid.v4() for generating a new player secret if not present
     
-
     return <div>
         <div>
             <label>
@@ -45,8 +45,8 @@ function PlayerDisplay({ player }) {
 }
 
 function StartedHeader({ gameId, nickname }) {
-    return <div>
-        <h4>Connected to Game: {gameId} as {nickname}</h4>
+    return <div className="started-header">
+        {/* <h4>Connected to Game: {gameId} as {nickname}</h4> */}
     </div>
 }
 

@@ -119,7 +119,7 @@ function GameBoard({playerMove, state, playerId}) {
                     {player.nickname}: {player.score} points
                 </div>
             ))}
-            <Golf gameState={state} playerMove={playerMove} />
+            <Golf gameState={state} playerId={playerId} />
         </div>;
     }
     return <Golf gameState={state} playerMove={playerMove} playerId={playerId} />

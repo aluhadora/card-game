@@ -23,15 +23,44 @@ export default function Golf({ gameState, playerMove, playerId }) {
     
     if (!gameState) return null;
 
+    const sortedPlayers = players(gameState, playerId);
+
     return (
         <div className="game-board">
             {/* <h3>State: {gameState.gameState}| Animated: {animateCard ? "Y" : "F"}</h3> */}
-            <DeckArea state={gameState} playerMove={playerMove} playerId={playerId} selectedCard={selectedCard} setSelectedCard={setSelectedCard} animateCard={setAnimateCard} animationRefs={animationRefs}/>
-            <div className='players-area'>
-                {players(gameState, playerId).map((player, index) => (
-                    <PlayerArea player={player} key={index} playerMove={playerMove} isUs={player.id === playerId} gameState={gameState} active={gameState.currentPlayerId === player.id || gameState.gameState === "Opening"} selectedCard={selectedCard} setSelectedCard={setSelectedCard} gameState={gameState.gameState} animationRefs={animationRefs}/>
+            <div>
+                <DeckArea state={gameState} playerMove={playerMove} playerId={playerId} selectedCard={selectedCard} setSelectedCard={setSelectedCard} animateCard={setAnimateCard} animationRefs={animationRefs}/>
+                <PlayerArea
+                    player={sortedPlayers[0]}
+                    gameState={gameState}
+                    playerMove={playerMove}
+                    isUs={true}
+                    selectedCard={selectedCard}
+                    setSelectedCard={setSelectedCard}
+                    animationRefs={animationRefs}
+                    active={gameState.currentPlayerId === playerId || gameState.gameState === "Opening"}
+                />
+            </div>
+            <div className="other-players-area">
+                {sortedPlayers.filter(player => player.id !== playerId).map((player, index) => (
+                    <PlayerArea
+                        player={player}
+                        key={index}
+                        playerMove={playerMove}
+                        isUs={false}
+                        gameState={gameState}
+                        selectedCard={selectedCard}
+                        setSelectedCard={setSelectedCard}
+                        animationRefs={animationRefs}
+                        active={gameState.currentPlayerId === player.id || gameState.gameState === "Opening"}
+                    />
                 ))}
             </div>
+            {/* <div className='players-area'>
+                {players(gameState, playerId).map((player, index) => (
+                    <PlayerArea player={player} key={index} playerMove={playerMove} isUs={player.id === playerId} gameState={gameState} active={gameState.currentPlayerId === player.id || gameState.gameState === "Opening"} selectedCard={selectedCard} setSelectedCard={setSelectedCard} animationRefs={animationRefs}/>
+                ))}
+            </div> */}
             <AnimationHandler animateCard={animateCard} setAnimateCard={setAnimateCard} setAnimationRefs={setAnimationRefs} animationRefs={animationRefs} />
         </div>
     );

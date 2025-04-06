@@ -19,7 +19,7 @@ const PORT = process.env.PORT || 3001;
 
 const server = http.createServer(app);
 const io = new Server(server, {
-    cors: { origin: "http://localhost:5173", methods: ["GET", "POST"] },
+    cors: { origin: ["http://localhost:5173", "http://192.168.50.200:5173"], methods: ["GET", "POST"] },
 });
 
 app.use((req, res, next) => {
@@ -65,6 +65,7 @@ io.on('connection', socket => {
         });
 
         socket.on('player-move', (data) => {
+            console.log(`Player move received in room ${data.pin} from player ${socket.id}:`, data);
             const delta = rooms[data.pin].playerMove({
                 playerId: socket.id,
                 ...data
@@ -106,6 +107,6 @@ app.get('*', (_, res) => {
     res.sendFile(path.resolve(__dirname, './client/dist', 'index.html'));
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, "0.0.0.0", () => {
     console.log(`Server listening on ${PORT}`);
 });
