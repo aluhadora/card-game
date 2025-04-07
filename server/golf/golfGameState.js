@@ -52,13 +52,16 @@ export default class GolfGame {
         this.moveValidator = new MoveValidator(this);
     }
 
-    visibleState() {
+    visibleState(extraData = {}) {
         return {
             currentPlayerId: this.currentPlayerId,
             gameState: this.gameState,
             players: this.players,
             discardPile: this.discards,
             remainingCards: this.deck.length() - this.totalUnrevealedCards(),
+            deckLength: this.deck.length(),
+            totalUnrevealedCards: this.totalUnrevealedCards(),
+            ...extraData
         };
     }
 
@@ -73,6 +76,7 @@ export default class GolfGame {
                 playArea: [null, null, null, null, null, null, null, null, null],
                 score: 0,
                 index: null,
+                selectedCard: null
             };
         } else {
             console.log(`Player ${playerName} is already in the game. and has rejoined`);
@@ -145,6 +149,11 @@ export default class GolfGame {
     advancePlayer() {
         const allPlayers = Object.values(this.players);
         const currentPlayer = allPlayers.find(player => player.id === this.currentPlayerId);
+
+        if (currentPlayer.selectedCard) {
+            console.warn(`Player ${currentPlayer.nickname} has not cleared their selected card. Cannot advance player.`);
+        }
+
         const currentIndex = currentPlayer.index;
         const nextIndex = (currentIndex + 1) % allPlayers.length || 0;
 
@@ -174,16 +183,12 @@ export default class GolfGame {
             this.gameState = "FirstCard";
         }
 
-        console.log(`Player ${player.nickname} has accepted a card. Current game state: ${this.gameState}`);
-
         this.recalculateScore(player); // Recalculate score after the move
 
-        return this.visibleState();
+        return this.visibleState({ delta: { from: `${player.id}-${moveData.cardIndex}`, to: `${player.id}-${moveData.cardIndex}`, card: player.playArea[moveData.cardIndex] } });
     }
 
     playerMove(moveData) {
-        console.log("Player move received:", moveData);
-
         if (!this.moveValidator.validateMove(moveData)) {
             console.error("Invalid move data:", moveData);
             return this.visibleState(); // Return the current state if the move is invalid
@@ -206,8 +211,75 @@ export default class GolfGame {
 
             this.recalculateScore();
             this.advancePlayer();
+        } else if (moveData.drawFromDeck) {
+            // Player drew a card from the deck
+            const drawnCard = this.deck.draw();
+            if (!drawnCard) {
+                console.error("No card to draw from deck!");
+                return this.visibleState();
+            }
 
+            if (currentPlayer.selectedCard) {
+                console.warn("Player already has a selected card. Cannot draw another one.");
+                return this.visibleState();
+            }
+
+            currentPlayer.selectedCard = drawnCard;
+            this.gameState = "SecondCard";
+            return this.visibleState({ delta: { from: "deck-card", to: `${currentPlayer.id}-selected`, card: drawnCard }});
+        } else if (moveData.selectFromDiscard) {
+            // Player selected a card from the discard pile
+            const selectedCard = this.discards.pop(); // Draw the top card from the discard pile
+            if (!selectedCard) {
+                console.error("No card to draw from discard pile!");
+                return this.visibleState();
+            }
+
+            currentPlayer.selectedCard = selectedCard; // Store the selected card for animation
+            return this.visibleState({ delta: { from: "discard-pile", to: `${currentPlayer.id}-selected`, card: selectedCard }});
+        } else if (moveData.acceptSelectedCard) {
+            // Player accepted the selected card
+            if (!currentPlayer.selectedCard) {
+                console.error("No selected card to accept!");
+                return this.visibleState();
+            }
+
+            const currentCardInSlot = currentPlayer.playArea[moveData.cardIndex];
+            currentPlayer.playArea[moveData.cardIndex] = currentPlayer.selectedCard; // Place the accepted card in the player's play area
+            if (currentCardInSlot) {
+                this.discards.push(currentCardInSlot); // Return the replaced card to the discard pile
+            } else {
+                this.discards.push(this.deck.draw());
+            }
+            
+            currentPlayer.selectedCard = null; // Clear the selected card
+            this.recalculateScore();
+            this.advancePlayer();
+            return this.visibleState({ deltas: [{ 
+                from: `${currentPlayer.id}-selected`, 
+                to: `${currentPlayer.id}-${moveData.cardIndex}`, 
+                card: currentPlayer.playArea[moveData.cardIndex] 
+            }, {
+                from: `${currentPlayer.id}-${moveData.cardIndex}`, 
+                to: `discard-pile`, 
+                card: this.discards.slice(-1)[0] 
+            }]});
+        } else if (moveData.declineSelectedCard) {
+            // Player declined the selected card
+            if (!currentPlayer.selectedCard) {
+                console.error("No selected card to decline!");
+                return this.visibleState();
+            }
+
+            this.discards.push(currentPlayer.selectedCard);
+            currentPlayer.selectedCard = null;
+            if (this.gameState !== "FirstCard") {
+                this.recalculateScore();
+                this.advancePlayer();
+            }
+            return this.visibleState({ delta: { from: `${currentPlayer.id}-selected`, to: `discard-pile`, card: currentPlayer.selectedCard }});
         } else if (this.gameState === "FirstCard") {
+            console.warn("I'm hoping this doesn't happen anymore")
             // Player declined the card, draw a new one
             const newCard = this.deck.draw();
             this.discards.push(newCard);

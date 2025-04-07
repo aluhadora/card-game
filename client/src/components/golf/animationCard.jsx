@@ -3,12 +3,12 @@ import Card from "../card";
 
 export default function AnimationCard({ card, from, to, duration = 250, onComplete }) {
 
-    console.log("AnimationCard from", from, "to", to, "duration", duration, "card", card);
-
     const initialStyle = {
         position: 'fixed',
         left: from?.left,
         top: from?.top,
+        width: from?.width,
+        height: from?.height,
         transition: `transform ${duration}ms ease-in-out`,
         transform: `translate(0px, 0px)`, 
         zIndex: 1000 // Ensure it's on top
@@ -38,7 +38,7 @@ export default function AnimationCard({ card, from, to, duration = 250, onComple
             style={style}
             onTransitionEnd={handleTransitionEnd}
         >
-            <Card card={card} />
+            <Card card={card} className={from.width > 25 ? "" : "small"} />
         </div>
     );
 }

@@ -38,21 +38,16 @@ function InitialHeader({ gameId, setGameId, joinGame, nickname, setNickname }) {
 }
 
 function PlayerDisplay({ player }) {
-    console.log("player display:", player);
     return <div>
         <h4>{player.nickname}</h4>
     </div>
 }
 
-function StartedHeader({ gameId, nickname }) {
-    return <div className="started-header">
-        {/* <h4>Connected to Game: {gameId} as {nickname}</h4> */}
-    </div>
+function StartedHeader() {
+    return null;
 }
 
 function LobbyHeader({ gameId, players, startGame, nickname }) {
-    console.log("Players:", players);
-    console.log("Players[0]:", players[0]);
     const url = `https://card-game-494d77369b6f.herokuapp.com/?pin=${gameId}`
     if (!players || !players.length) return <div>Loading...</div>;
 
@@ -76,15 +71,9 @@ function PostConnectionHeader({ gameId, players, startGame, started, nickname })
     return <LobbyHeader gameId={gameId} players={players} startGame={startGame} nickname={nickname} />;
 }
 
-function Header({ gameId, setGameId, connected, joinGame, players, startGame, started }) {
+export default function ConnectionManager({ gameId, setGameId, joinGame, players, connected, started, startGame }) {
     const [nickname, setNickname] = useState(localStorage.getItem("nickname") || "");
 
     if (!connected) return <InitialHeader gameId={gameId} setGameId={setGameId} joinGame={joinGame} nickname={nickname} setNickname={setNickname} />;
     return <PostConnectionHeader gameId={gameId} players={players} startGame={startGame} started={started} nickname={nickname} />;
-}
-
-export default function ConnectionManager({ gameId, setGameId, joinGame, players, connected, started, startGame }) {
-    return <div>
-        <Header gameId={gameId} setGameId={setGameId} joinGame={joinGame} players={players} connected={connected} started={started} startGame={startGame} />
-    </div>
 }

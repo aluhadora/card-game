@@ -1,38 +1,32 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import AnimationCard from "./animationCard";
 
-export default function AnimationHandler({ animateCard, setAnimateCard, setAnimationRefs }) {
-    const deckRef = useRef();
-    const discardRef = useRef();
-    const selectedCardRef = useRef();
+export default function AnimationHandler({animationDeltas, setAnimationDeltas }) {
+    const [animateCard, setAnimateCard] = useState(null);
+
 
     useEffect(() => {
+        if (!animationDeltas || animationDeltas.length === 0) return;
+        const firstDelta = animationDeltas[0];
+        const from = document.querySelector(`#${firstDelta.from}`)?.getBoundingClientRect();
+        const to = document.querySelector(`#${firstDelta.to}`)?.getBoundingClientRect();
 
-        const move = (from, to, refs) => {
-            setAnimateCard({
-                from: from,
-                to: to,
-                card: refs.card,
-                onAnimationComplete: refs.onAnimationComplete
-            });
+        if (!from || !to) {
+            console.error("AnimationHandler: from or to element not found", { from, to }, firstDelta);
+            setAnimationDeltas(animationDeltas.slice(1)); // Remove the first delta and continue
+            return;
         }
+        setAnimateCard({
+            from: from,
+            to: to,
+            card: firstDelta.card
+        });
+        setTimeout(() => {
+            setAnimateCard(null);
+            setAnimationDeltas(animationDeltas.slice(1));
+        }, 250);
 
-        const toDiscard = (refs)  => {
-            console.log("toDiscard called", refs.discardRef.current?.getBoundingClientRect(), refs.from);
-            move(refs.from, refs.discardRef.current?.getBoundingClientRect(), refs);
-        };
-
-        const toSelected = (refs) => {
-            move(refs.from, refs.selectedCardRef.current?.getBoundingClientRect(), refs);
-        };
-
-        const fromSelected = (refs) => {
-            console.log("fromSelected called", refs.selectedCardRef.current?.getBoundingClientRect(), refs.to);
-            move(refs.selectedCardRef.current?.getBoundingClientRect(), refs.to, refs);
-        }
-
-        setAnimationRefs({ deckRef, discardRef, selectedCardRef, toDiscard, fromSelected, toSelected});
-    }, [setAnimateCard, setAnimationRefs]);
+    }, [setAnimateCard, animationDeltas, setAnimationDeltas]);
     
     if (!animateCard) return null;
 

@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css'
 import io from 'socket.io-client';
 import ConnectionManager from './components/connectionManager';
 import Golf from './components/golf/golf';
+import AnimationHandler from './components/golf/animationHandler';
 
 export default function App() {
 
@@ -17,14 +18,16 @@ export default function App() {
     const [socket, setSocket] = useState(null);
     const [deltas, setDeltas] = useState([]); // For tracking game state changes if needed
 
+    const [animationDeltas, setAnimationDeltas] = useState([]);
+
     const addPlayer = (playerData) => {
         setMessages(messages => [...messages, playerData]);
-        // Check if the player already exists
+
         const existingPlayer = players.find(player => player.id === playerData.id);
         if (existingPlayer) {
-            console.log("Player already exists:", existingPlayer);
-            return; // Player already exists, do not add again
+            return; 
         }
+
         setPlayers(players => [...players, playerData]);
     }
 
@@ -36,7 +39,6 @@ export default function App() {
         setMessages(messages => [...messages, data]);
         setDeltas([data]); // Store the initial state
         setStarted(true);
-        console.log("Game has started!");
     }
 
     const getRoomState = async () => {
@@ -50,10 +52,8 @@ export default function App() {
         }
 
         const data = await response.json();
-        console.log("roomstate", data);
         
         setDeltas([data.gameState]); 
-        console.log("Fetched room state:", data);
         
         return data;
     }
@@ -86,10 +86,22 @@ export default function App() {
         }
     }
 
-    const playerMoved = delta => {
-        console.log("Player moved:", delta);
-        setDeltas([delta]); // Store the new state
-        setMessages(messages => [...messages, delta]);
+    const playerMoved = state => {
+        console.log("Player moved:", state);
+        if (state.delta) {
+            console.log("Handling animation delta:", state.delta);
+            setAnimationDeltas(deltas => [...deltas, state.delta]);
+            setTimeout(() => setDeltas([state]), 300); 
+        } else if (state.deltas) {
+            console.log("Handling multiple deltas:", state.deltas);
+            setAnimationDeltas(deltas => [...deltas, ...state.deltas]);
+            setTimeout(() => setDeltas([state]), 250*state.deltas.length + 50); 
+        } else {
+            console.log("Skipping animation");
+            setDeltas([state]); // Store the new state
+        }
+
+        setMessages(messages => [...messages, state]);
     }
 
     const playerMove = moveData => {
@@ -101,6 +113,7 @@ export default function App() {
         <div>
             <ConnectionManager gameId={gameId} setGameId={setGameId} joinGame={joinGame} players={players} playerId={playerId} connected={connected} started={started} startGame={startGame} />
             {started && <GameBoard playerMove={playerMove} players={players} state={deltas[0]} playerId={playerId} />}
+            <AnimationHandler animationDeltas={animationDeltas} setAnimationDeltas={setAnimationDeltas} />
         </div>
     )
 }
