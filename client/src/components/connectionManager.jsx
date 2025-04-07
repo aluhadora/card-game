@@ -5,29 +5,29 @@ import * as uuid from "uuid";
 function InitialHeader({ gameId, setGameId, joinGame, nickname, setNickname }) {
     const [playerId, setPlayerId] = useState(localStorage.getItem("playerId") || uuid.v4()); // Use uuid.v4() for generating a new player ID if not present
     const [playerSecret, setPlayerSecret] = useState(localStorage.getItem("playerSecret") || uuid.v4()); // Use uuid.v4() for generating a new player secret if not present
-    
+
     return <div>
         <div>
             <label>
-                Game ID: 
+                Game ID:
                 <input type='text' placeholder='Enter Game ID' value={gameId} onChange={e => setGameId(e.target.value)} />
             </label>
         </div>
         <div>
             <label>
-                Nickname: 
+                Nickname:
                 <input type='text' placeholder='Enter Name' value={nickname} onChange={e => setNickname(e.target.value)} />
             </label>
         </div>
         <div>
             <label>
-                PlayerId: 
+                PlayerId:
                 <input type='text' placeholder='Enter Player ID' value={playerId} onChange={e => setPlayerId(e.target.value)} />
             </label>
         </div>
         <div>
             <label>
-                Secret: 
+                Secret:
                 <input type='text' placeholder='Enter Secret' value={playerSecret} onChange={e => setPlayerSecret(e.target.value)} />
             </label>
         </div>
@@ -61,14 +61,37 @@ function LobbyHeader({ gameId, players, startGame, nickname }) {
             <h3>Share this Game ID:</h3>
             <input type="text" value={url} readOnly style={{ width: "200px" }} />
             <p>Scan the QR code to join:</p>
-            <QRCodeSVG value={url}/>
+            <QRCodeSVG value={url} />
         </div>
     </div>
 }
 
 function PostConnectionHeader({ gameId, players, startGame, started, nickname }) {
+    const [gameSettings, setGameSettings] = useState({ decks: 1, type: "golf" });
+
     if (started) return <StartedHeader gameId={gameId} nickname={nickname} />;
-    return <LobbyHeader gameId={gameId} players={players} startGame={startGame} nickname={nickname} />;
+    return (
+        <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+            <LobbyHeader gameId={gameId} players={players} startGame={() => startGame(gameSettings)} nickname={nickname} />
+            <div>
+                <div>
+                    <label>
+                        Game Type:
+                        <select value={gameSettings.type} onChange={e => setGameSettings({ ...gameSettings, type: e.target.value })}>
+                            <option value="golf">Golf</option>
+                        </select>
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        Number of Decks (recommended min: {Math.round(players.length / 2)}):
+                        <input type='number' min={1} max={10} value={gameSettings.decks} onChange={e => setGameSettings({ ...gameSettings, decks: e.target.value })} />
+                    </label>
+                </div>
+            </div>
+
+        </div>
+    );
 }
 
 export default function ConnectionManager({ gameId, setGameId, joinGame, players, connected, started, startGame }) {

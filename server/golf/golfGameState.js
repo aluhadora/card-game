@@ -83,8 +83,9 @@ export default class GolfGame {
         }
     }
 
-    startGame() {
+    startGame(settings) {
         this.gameState = "Opening";
+        this.deck = new Deck(settings?.decks || 1); // Reset the deck for a new game
         let index = 0;
         Object.values(this.players).forEach(player => {
             player.index = index++;

@@ -55,10 +55,10 @@ io.on('connection', socket => {
 
         socket.on('start-game', (data) => {
             if (rooms[data.pin]) {
-                const initialGameState = rooms[data.pin].startGame();
+                const initialGameState = rooms[data.pin].startGame(data);
                 io.to(data.pin).emit('game-started', initialGameState);
                 socket.to(data.pin).emit('game-started', initialGameState);
-                console.log(`Game started in room ${data.pin}`);
+                console.log(`Game started in room ${data.pin}.  ${JSON.stringify(data)}`);
             } else {
                 console.error(`Room ${data.pin} does not exist.`);
             }

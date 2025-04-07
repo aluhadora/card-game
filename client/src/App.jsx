@@ -31,8 +31,8 @@ export default function App() {
         setPlayers(players => [...players, playerData]);
     }
 
-    const startGame = () => {
-        socket.emit("start-game", { pin: gameId });
+    const startGame = (settings) => {
+        socket.emit("start-game", { pin: gameId, ...settings });
     }
 
     const gameStarted = (data) => {

@@ -45,13 +45,13 @@ export default class RoomState {
         this.gameState.addPlayer(data);
     }
 
-    startGame() {
+    startGame(data) {
         if (this.roomstate !== "Lobby") {
             console.error("Cannot start game, room is not in Lobby state.");
             return;
         }
         this.roomstate = "Running";
-        return this.gameState.startGame();
+        return this.gameState.startGame(data);
     }
 
     playerMove(data) {
