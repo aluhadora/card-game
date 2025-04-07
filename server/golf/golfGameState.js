@@ -185,7 +185,7 @@ export default class GolfGame {
 
         this.recalculateScore(player); // Recalculate score after the move
 
-        return this.visibleState({ delta: { from: `${player.id}-${moveData.cardIndex}`, to: `${player.id}-${moveData.cardIndex}`, card: player.playArea[moveData.cardIndex] } });
+        return this.visibleState({ delta: { from: `p${player.id}-${moveData.cardIndex}`, to: `p${player.id}-${moveData.cardIndex}`, card: player.playArea[moveData.cardIndex] } });
     }
 
     playerMove(moveData) {
@@ -226,7 +226,7 @@ export default class GolfGame {
 
             currentPlayer.selectedCard = drawnCard;
             this.gameState = "SecondCard";
-            return this.visibleState({ delta: { from: "deck-card", to: `${currentPlayer.id}-selected`, card: drawnCard }});
+            return this.visibleState({ delta: { from: "deck-card", to: `p${currentPlayer.id}-selected`, card: drawnCard }});
         } else if (moveData.selectFromDiscard) {
             // Player selected a card from the discard pile
             const selectedCard = this.discards.pop(); // Draw the top card from the discard pile
@@ -236,7 +236,7 @@ export default class GolfGame {
             }
 
             currentPlayer.selectedCard = selectedCard; // Store the selected card for animation
-            return this.visibleState({ delta: { from: "discard-pile", to: `${currentPlayer.id}-selected`, card: selectedCard }});
+            return this.visibleState({ delta: { from: "discard-pile", to: `p${currentPlayer.id}-selected`, card: selectedCard }});
         } else if (moveData.acceptSelectedCard) {
             // Player accepted the selected card
             if (!currentPlayer.selectedCard) {
@@ -256,11 +256,11 @@ export default class GolfGame {
             this.recalculateScore();
             this.advancePlayer();
             return this.visibleState({ deltas: [{ 
-                from: `${currentPlayer.id}-selected`, 
-                to: `${currentPlayer.id}-${moveData.cardIndex}`, 
+                from: `p${currentPlayer.id}-selected`, 
+                to: `p${currentPlayer.id}-${moveData.cardIndex}`, 
                 card: currentPlayer.playArea[moveData.cardIndex] 
             }, {
-                from: `${currentPlayer.id}-${moveData.cardIndex}`, 
+                from: `p${currentPlayer.id}-${moveData.cardIndex}`, 
                 to: `discard-pile`, 
                 card: this.discards.slice(-1)[0] 
             }]});
@@ -277,7 +277,7 @@ export default class GolfGame {
                 this.recalculateScore();
                 this.advancePlayer();
             }
-            return this.visibleState({ delta: { from: `${currentPlayer.id}-selected`, to: `discard-pile`, card: currentPlayer.selectedCard }});
+            return this.visibleState({ delta: { from: `p${currentPlayer.id}-selected`, to: `discard-pile`, card: currentPlayer.selectedCard }});
         } else if (this.gameState === "FirstCard") {
             console.warn("I'm hoping this doesn't happen anymore")
             // Player declined the card, draw a new one

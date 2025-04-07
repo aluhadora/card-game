@@ -5,7 +5,7 @@ function OtherPlayerInfo({ player, selectedCard=null }) {
         <div className="player-info">
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center"}}>
             <h6>{player.nickname}:{player.score}</h6>
-            <Card id={`${player.id}-selected`} card={selectedCard} renderBackForNull={false} className="small" /> 
+            <Card id={`p${player.id}-selected`} card={selectedCard} renderBackForNull={false} className="small" /> 
         </div>
     </div>
     );
@@ -21,7 +21,7 @@ function PlayerInfo({ player, isUs, active, selectedCard }) {
             <p>Score: {player.score || 0}</p>
         </div>
         
-        {isUs && active && <span><Card id={`${player.id}-selected`} card={selectedCard} renderBackForNull={false} className={!isUs ? "small" : ""}/>Selected</span>}
+        {isUs && active && <span><Card id={`p${player.id}-selected`} card={selectedCard} renderBackForNull={false} className={!isUs ? "small" : ""}/>Selected</span>}
     </div>
     );
 }
@@ -51,13 +51,13 @@ export default function PlayerArea({ player, gameState, playerMove, active, isUs
                             return (
                                 <tr key={index}>
                                     <td>
-                                        <Card id={`${player.id}-${index}`} onClick={e => cardClick({acceptCard: true, cardIndex: index}, e)} card={card} active={active && isUs} className={!isUs ? "small" : ""} />
+                                        <Card id={`p${player.id}-${index}`} onClick={e => cardClick({acceptCard: true, cardIndex: index}, e)} card={card} active={active && isUs} className={!isUs ? "small" : ""} />
                                     </td>
                                     <td>
-                                        <Card id={`${player.id}-${index+1}`} onClick={e => cardClick({acceptCard: true, cardIndex: index + 1}, e)} card={player.playArea[index + 1]} active={active && isUs} className={!isUs ? "small" : ""} />
+                                        <Card id={`p${player.id}-${index+1}`} onClick={e => cardClick({acceptCard: true, cardIndex: index + 1}, e)} card={player.playArea[index + 1]} active={active && isUs} className={!isUs ? "small" : ""} />
                                     </td>
                                     <td>
-                                        <Card id={`${player.id}-${index+2}`} onClick={e => cardClick({acceptCard: true, cardIndex: index + 2}, e)} card={player.playArea[index + 2]} active={active && isUs} className={!isUs ? "small" : ""} />
+                                        <Card id={`p${player.id}-${index+2}`} onClick={e => cardClick({acceptCard: true, cardIndex: index + 2}, e)} card={player.playArea[index + 2]} active={active && isUs} className={!isUs ? "small" : ""} />
                                     </td>
                                 </tr>
                             );
