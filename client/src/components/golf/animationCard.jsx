@@ -40,8 +40,10 @@ export default function AnimationCard({ animateCard, card, from, to, duration = 
                 setStyle((prevStyle) => ({
                     ...prevStyle,
                     transform: `translate(0px, 0px)`, 
+                    transition: 'none',
                     display: 'block',
-                    opacity: 0
+                    opacity: 0,
+                    zIndex: -1000,
                 }));
             }, duration);
 
