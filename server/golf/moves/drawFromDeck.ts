@@ -2,14 +2,14 @@ import { GameStates } from "../constants";
 import MoveData from "../moveData";
 
 export default function drawFromDeck({player, actions} : MoveData) {
+    if (player.selectedCard) {
+        console.warn("Player already has a selected card. Cannot draw another one.");
+        return;
+    }
+    
     const drawnCard = actions.draw();
     if (!drawnCard) {
         console.error("No card to draw from deck!");
-        return;
-    }
-
-    if (player.selectedCard) {
-        console.warn("Player already has a selected card. Cannot draw another one.");
         return;
     }
 

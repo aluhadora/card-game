@@ -4,6 +4,7 @@ import io from 'socket.io-client';
 import ConnectionManager from './components/connectionManager';
 import Golf from './components/golf/golf';
 import AnimationHandler from './components/golf/animationHandler';
+import { animationTime } from './logic/animationConfiguration';
 
 export default function App() {
 
@@ -81,22 +82,27 @@ export default function App() {
         if (state && state.roomstate !== "Lobby") setStarted(true);
     }
 
+    const setState = state => {
+        console.log("Setting state:", state);
+        setDeltas([state]);
+    }
+
     const playerMoved = state => {
         console.log("Player moved:", state);
         if (state.delta) {
             console.log("Handling animation delta:", state.delta);
             setAnimationDeltas(deltas => [...deltas, state.delta]);
-            setTimeout(() => setDeltas([state]), 300); 
+            setTimeout(() => setState(state), animationTime + 50); 
         } else if (state.deltas) {
             console.log("Handling multiple deltas:", state.deltas);
             setAnimationDeltas(deltas => [...deltas, ...state.deltas]);
-            setTimeout(() => setDeltas([state]), 250*state.deltas.length + 50); 
+            setTimeout(() => setState(state), animationTime*state.deltas.length + 50); 
         } else {
             console.log("Skipping animation");
-            setDeltas([state]); // Store the new state
+            setState(state); // Store the new state
         }
 
-        setMessages(messages => [...messages, state]);
+        // setMessages(messages => [...messages, state]);
     }
 
     const playerMove = moveData => {

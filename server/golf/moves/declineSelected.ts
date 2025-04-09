@@ -15,5 +15,9 @@ export default function declineSelected({player, actions, gameState, discards} :
         actions.advancePlayer();
     }
 
-    return { delta: { from: `p${player.id}-selected`, to: `discard-pile`, card: player.selectedCard }};
+    return { 
+        delta: { 
+            from: `p${player.id}-selected`, 
+            to: `discard-pile`, 
+            card: discards.slice(-1)[0] }};
 }

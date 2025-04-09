@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import AnimationCard from "./animationCard";
+import { animationTime } from "../../logic/animationConfiguration";
 
 export default function AnimationHandler({animationDeltas, setAnimationDeltas }) {
     const [animateCard, setAnimateCard] = useState(null);
-
 
     useEffect(() => {
         if (!animationDeltas || animationDeltas.length === 0) return;
@@ -24,19 +24,10 @@ export default function AnimationHandler({animationDeltas, setAnimationDeltas })
         setTimeout(() => {
             setAnimateCard(null);
             setAnimationDeltas(animationDeltas.slice(1));
-        }, 250);
+        }, animationTime);
 
     }, [setAnimateCard, animationDeltas, setAnimationDeltas]);
-    
-    if (!animateCard) return null;
 
-    const completeAnimation = (animation) => {
-        setAnimateCard(null);
 
-        if (animation.onAnimationComplete) {
-            animation.onAnimationComplete();
-        }
-    }
-
-    return <AnimationCard from={animateCard.from} to={animateCard.to} onComplete={() => completeAnimation(animateCard)} card={animateCard.card} />
+    return <AnimationCard from={animateCard?.from} to={animateCard?.to} card={animateCard?.card} animateCard={animateCard} />
 }

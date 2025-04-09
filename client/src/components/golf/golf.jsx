@@ -10,7 +10,7 @@ function players(gameState, playerId) {
 }
 
 export default function Golf({ gameState, playerMove, playerId }) {
-    useDeckPreloader();
+    // useDeckPreloader();
 
     if (!gameState) return null;
 
