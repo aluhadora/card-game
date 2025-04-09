@@ -37,7 +37,7 @@ export default function PlayerArea({ player, gameState, playerMove, active, isUs
 
         if (!active || !isUs) return;
 
-        playerMove({ acceptSelectedCard: true, cardIndex: move.cardIndex });
+        playerMove({ moveType: "acceptSelected", cardIndex: move.cardIndex });
     }
 
     return (

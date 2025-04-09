@@ -1,6 +1,6 @@
 import DeckArea from "./deckArea";
 import PlayerArea from "./playerArea";
-import AnimationHandler from "./animationHandler";
+import useDeckPreloader from "../../hooks/useDeckPreloader";
 
 function players(gameState, playerId) {
     const players = Object.values(gameState.players);
@@ -10,11 +10,12 @@ function players(gameState, playerId) {
 }
 
 export default function Golf({ gameState, playerMove, playerId }) {
+    useDeckPreloader();
 
     if (!gameState) return null;
 
     const sortedPlayers = players(gameState, playerId);
-    const active = playerId => (gameState.gameState != "GameOver" && gameState.currentPlayerId === playerId) || (gameState.gameState === "Opening" && gameState.players[playerId].playArea.filter(card => card !== null).length < 2);
+    const active = playerId => (gameState.gameState != "GameOver" && gameState.currentPlayerId === playerId) || (gameState.gameState === "Opening" && gameState?.players[playerId]?.playArea.filter(card => card !== null).length < 2);
 
     return (
         <div className="game-board">

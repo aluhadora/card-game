@@ -1,10 +1,12 @@
+import { GameStates } from "./constants";
+
 export default class MoveValidator {
     constructor(golfGame) {
         this.golfGame = golfGame;
     }
 
     validateOpeningStatePlayerMove(moveData) {
-        if (this.golfGame.gameState !== "Opening") {
+        if (this.golfGame.gameState !== GameStates.Opening) {
             return true;
         }
 
@@ -36,7 +38,7 @@ export default class MoveValidator {
     }
 
     validatePlayerTurn(moveData) {
-        if (this.golfGame.gameState === "Opening") return true;
+        if (this.golfGame.gameState === GameStates.Opening) return true;
 
         if (this.golfGame.currentPlayerId !== moveData.playerId) {
             console.error(`It's not player ${moveData.playerId}'s turn! Current player is ${this.golfGame.currentPlayerId}.`);

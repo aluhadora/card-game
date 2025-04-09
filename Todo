@@ -1,0 +1,16 @@
+Preloading images
+Implement Garbage Game
+Maybe only host to set game settings
+Multiple players per client
+Would love to break up golf game moves.  That Move method does way too much
+Backgrounds
+Customizable deck images (S3?)
+Display plan for > 4 players
+Messages Panel
+    Move log
+    Chat
+    Debugging Events/State
+Would love to move sockets from App
+    Maybe useGameSockets hook with a listener dictionary, "event-key": [listeners]
+Some constants to kill magic strings
+Move to typeScript

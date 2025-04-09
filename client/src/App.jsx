@@ -78,12 +78,7 @@ export default function App() {
         setSocket(socket);
 
         const state = await getRoomState();
-        if (state && state.roomstate !== "Lobby") {
-            console.log("Game is not in Lobby state, starting game...");
-            setStarted(true);
-        } else {
-            console.log("Game is in Lobby state, waiting for start...", state);
-        }
+        if (state && state.roomstate !== "Lobby") setStarted(true);
     }
 
     const playerMoved = state => {

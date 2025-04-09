@@ -7,9 +7,9 @@ function DeckCard({ state, playerMove, playerId }) {
         if (!active) return;
 
         if (state.gameState === "FirstCard") {
-            playerMove({ drawFromDeck: true }); 
+            playerMove({ moveType: "drawFromDeck"}); 
         } else {
-            playerMove({ acceptCard: false }); 
+            playerMove({ moveType: "declineSelected" }); 
         }
     };
 
@@ -27,13 +27,13 @@ function DiscardPile( { state, playerMove, selectedCard } ) {
         if (!state || state.gameState === "Opening") return; 
 
         if (selectedCard) {
-            playerMove({ declineSelectedCard: true }); 
+            playerMove({ moveType: "declineSelected" }); 
             return;
         }
 
         if (state.gameState === "SecondCard") return;
 
-        playerMove({ selectFromDiscard: true }); 
+        playerMove({ moveType: "selectFromDiscard" }); 
         return;
     };
 

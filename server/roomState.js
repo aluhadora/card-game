@@ -6,7 +6,7 @@ export default class RoomState {
         this.roomId = data.pin;
         this.players = []; 
         this.roomstate = "Lobby";
-        this.gameState = new GolfGame();
+        this.gameState = new GolfGame.default();
     }
 
     joinNewPlayer(data) {

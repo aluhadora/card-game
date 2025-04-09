@@ -71,7 +71,7 @@ function PostConnectionHeader({ gameId, players, startGame, started, nickname })
 
     if (started) return <StartedHeader gameId={gameId} nickname={nickname} />;
     return (
-        <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
             <LobbyHeader gameId={gameId} players={players} startGame={() => startGame(gameSettings)} nickname={nickname} />
             <div>
                 <div>
