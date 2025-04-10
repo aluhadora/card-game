@@ -1,3 +1,4 @@
+import { GameStates, MoveTypes } from "../../constants";
 import Card from "../card"
 
 function DeckCard({ state, playerMove, playerId }) {
@@ -6,8 +7,8 @@ function DeckCard({ state, playerMove, playerId }) {
     const cardClick = () => {
         if (!active) return;
 
-        if (state.gameState === "FirstCard") {
-            playerMove({ moveType: "drawFromDeck"}); 
+        if (state.gameState === GameStates.FirstCard) {
+            playerMove({ moveType: MoveTypes.DrawFromDeck}); 
         } else {
             playerMove({ moveType: "declineSelected" }); 
         }
