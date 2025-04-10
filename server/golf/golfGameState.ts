@@ -1,6 +1,5 @@
 import { GameStates } from "./constants.ts";
 import MoveHandler from "./moveHandler.ts";
-import MoveValidator from "./moveValidator.js";
 import { Card, Player, MoveData } from "./types";
 
 class Deck {
@@ -54,7 +53,6 @@ export default class GolfGame {
     currentPlayerId : string | null;
     discards: Card[];
     deck: Deck;
-    moveValidator : MoveValidator;
     moveHandler : MoveHandler;
 
     constructor() {
@@ -63,8 +61,6 @@ export default class GolfGame {
         this.currentPlayerId = null;
         this.discards = [];
         this.deck = new Deck(); // Initialize the deck
-        this.moveValidator = new MoveValidator(this);
-        console.log("MoveValidator", MoveValidator, "MoveHandler", MoveHandler)
         this.moveHandler = new MoveHandler();
     }
 
@@ -205,23 +201,19 @@ export default class GolfGame {
     }
 
     playerMove(moveData : MoveData) : any | undefined {
-        if (!this.moveValidator.validateMove(moveData)) {
-            console.error("Invalid move data:", moveData);
-            return this.visibleState(); // Return the current state if the move is invalid
-        }
-
         const actions = {
             draw: this.deck.draw,
             recalculateScore: this.recalculateScore.bind(this),
             advancePlayer: this.advancePlayer.bind(this),
             gameState: this.advanceGameState.bind(this),
-        }
+        };
 
         const delta = this.moveHandler.handleMove({...moveData, 
             actions,
             player: this.players[moveData.playerId],
             gameState: this.gameState,
-            discards: this.discards 
+            discards: this.discards, 
+            currentPlayerId: this.currentPlayerId || ""
         });
 
         return this.visibleState(delta);

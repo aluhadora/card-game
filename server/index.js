@@ -40,7 +40,7 @@ io.on('connection', socket => {
         socket.on('player-joined', (data) => {
             let room = rooms[data.pin];
             if (!room) {
-                rooms[data.pin] = new RoomState();
+                rooms[data.pin] = new RoomState.default();
                 room = rooms[data.pin];
                 room.joinHost({ roomId: data.pin, playerId: data.playerId, nickname: data.nickname, socketId: socket.id, playerSecret: data.playerSecret });
                 console.log(`Host created room ${data.pin} with ID ${socket.id}`);

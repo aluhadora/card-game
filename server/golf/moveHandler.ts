@@ -1,18 +1,19 @@
 import acceptSelected from "./moves/acceptSelected";
 import declineSelected from "./moves/declineSelected";
 import drawFromDeck from "./moves/drawFromDeck";
-import MoveData from "./moveData";
 import openingMove from "./moves/openingMove";
 import selectFromDiscard from "./moves/selectFromDiscard";
 import { GameStates, MoveTypes } from "./constants";
+import MoveValidator from "./moveValidator";
+import { MoveData } from "./types";
 
 
 export default class MoveHandler {
-    // moveDictionary is a dictionary from string to function handling a moveType
-
+    moveValidator: MoveValidator;
     moveDictionary: Record<string, (moveData: MoveData) => {} | undefined>;
 
     constructor() {
+        this.moveValidator = new MoveValidator();
         this.moveDictionary = {};
         this.moveDictionary[MoveTypes.OpeningMove] = openingMove;
         this.moveDictionary[MoveTypes.DrawFromDeck] = drawFromDeck;
@@ -22,6 +23,8 @@ export default class MoveHandler {
     }
 
     handleMove(moveData : MoveData) : {} | undefined {
+        if (!this.moveValidator.validateMove(moveData)) return;
+
         if (moveData.gameState === GameStates.Opening) {
             return this.moveDictionary[MoveTypes.OpeningMove](moveData);
         }

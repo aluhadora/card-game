@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Card from "../card";
 import { animationTime } from "../../logic/animationConfiguration";
 
-export default function AnimationCard({ animateCard, card, from, to, duration = animationTime, onComplete }) {
+export default function AnimationCard({ animateCard, card, from, to, duration = animationTime }) {
 
     const initialStyle = {
         position: 'absolute',
@@ -36,10 +36,11 @@ export default function AnimationCard({ animateCard, card, from, to, duration = 
 
         // Trigger the animation after the component mounts
         const timeout = setTimeout(() => {
+            const scale = to?.width && from?.width ? to.width / from.width : 1;
             setTimeout(() => {
                 setStyle((prevStyle) => ({
                     ...prevStyle,
-                    transform: `translate(0px, 0px)`, 
+                    transform: `translate(0px, 0px) scale(1)`, 
                     transition: 'none',
                     display: 'block',
                     opacity: 0,
@@ -55,7 +56,7 @@ export default function AnimationCard({ animateCard, card, from, to, duration = 
                     width: from?.width,
                     height: from?.height,
                     transition: animateCard ? `transform ${duration}ms ease-in-out` : 'none',
-                    transform: `translate(${to?.left - from?.left}px, ${to?.top - from?.top}px)`,
+                    transform: `translate(${to?.left - from?.left}px, ${to?.top - from?.top}px) scale(${scale})`,
                     display: 'block',
                     opacity: 1
                 }));

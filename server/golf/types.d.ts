@@ -17,6 +17,7 @@ export type Card = {
 export type MoveData = {
     moveType: string;
     playerId: string;
+    currentPlayerId: string;
     cardIndex: number;
     discards: Card[];
     gameState: string;
