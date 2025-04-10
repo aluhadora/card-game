@@ -27,7 +27,7 @@ export default function AnimationCard({ animateCard, card, from, to, duration = 
             width: from?.width,
             height: from?.height,
             transition: 'none',
-            transform: `translate(0px, 0px)`, 
+            transform: `translate(0px, 0px) scale(1)`, 
             // display: animateCard ? 'block' : 'none',
             display: 'block',
             opacity: 0,
@@ -72,7 +72,7 @@ export default function AnimationCard({ animateCard, card, from, to, duration = 
             className="animation-card"
             style={style}
         >
-            <Card card={card} />
+            <Card card={card} className={from?.width > 25 ? "" : "small"}/>
         </div>
     );
 }
