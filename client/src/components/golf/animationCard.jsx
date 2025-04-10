@@ -72,7 +72,7 @@ export default function AnimationCard({ animateCard, card, from, to, duration = 
             className="animation-card"
             style={style}
         >
-            <Card card={card} className={from?.width > 25 ? "" : "small"} />
+            <Card card={card} />
         </div>
     );
 }
