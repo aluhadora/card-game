@@ -45,6 +45,7 @@ class Deck {
     length () {
         return this.shuffledDeck.length;
     }
+    
 }
 
 export default class GolfGame {
