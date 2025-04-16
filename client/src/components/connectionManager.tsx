@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 import { QRCodeSVG } from 'qrcode.react';
 import * as uuid from "uuid";
+import React from "react";
 
 function InitialHeader({ gameId, setGameId, joinGame, nickname, setNickname }) {
     const [playerId, setPlayerId] = useState(localStorage.getItem("playerId") || uuid.v4()); // Use uuid.v4() for generating a new player ID if not present
@@ -43,17 +44,13 @@ function PlayerDisplay({ player }) {
     </div>
 }
 
-function StartedHeader() {
-    return null;
-}
-
 function LobbyHeader({ gameId, players, startGame, nickname }) {
-    const url = `https://card-game-494d77369b6f.herokuapp.com/?pin=${gameId}`
-    if (!players || !players.length) return <div>Loading...</div>;
+    const url = `${window.location.origin}/?pin=${gameId}`
+    if (!players || !Object.keys(players).length) return <div>Loading...</div>;
 
     return <div>
         <span>Connected to Game: {gameId} as {nickname}</span>
-        {Object.values(players.slice(-1)[0].players).map((player, index) => (
+        {Object.values(players).map((player, index) => (
             <PlayerDisplay player={player} key={index} />
         ))}
         <button onClick={startGame}>Start Game</button>
@@ -69,7 +66,16 @@ function LobbyHeader({ gameId, players, startGame, nickname }) {
 function PostConnectionHeader({ gameId, players, startGame, started, nickname }) {
     const [gameSettings, setGameSettings] = useState({ decks: 1, type: "golf" });
 
-    if (started) return <StartedHeader gameId={gameId} nickname={nickname} />;
+    useEffect(() => {
+        if (!players) return;
+        console.log("Recalculating decks based on players length", players);
+        setGameSettings(settings => ({ ...settings, decks: Math.round(Object.keys(players).length / 2)}));
+    }, [players]);
+
+    console.log("PostConnectionHeader", players, started);
+
+    if (started || !players) return null;
+
     return (
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
             <LobbyHeader gameId={gameId} players={players} startGame={() => startGame(gameSettings)} nickname={nickname} />
@@ -84,8 +90,8 @@ function PostConnectionHeader({ gameId, players, startGame, started, nickname })
                 </div>
                 <div>
                     <label>
-                        Number of Decks (recommended min: {Math.round(players.length / 2)}):
-                        <input type='number' min={1} max={10} value={gameSettings.decks} onChange={e => setGameSettings({ ...gameSettings, decks: e.target.value })} />
+                        Number of Decks (recommended min: {Math.round(Object.keys(players).length / 2)}):
+                        <input type='number' min={1} max={10} value={gameSettings.decks} onChange={e => setGameSettings({ ...gameSettings, decks: parseInt(e.target.value) })} />
                     </label>
                 </div>
             </div>
@@ -98,5 +104,5 @@ export default function ConnectionManager({ gameId, setGameId, joinGame, players
     const [nickname, setNickname] = useState(localStorage.getItem("nickname") || "");
 
     if (!connected) return <InitialHeader gameId={gameId} setGameId={setGameId} joinGame={joinGame} nickname={nickname} setNickname={setNickname} />;
-    return <PostConnectionHeader gameId={gameId} players={players} startGame={startGame} started={started} nickname={nickname} />;
+    return <PostConnectionHeader gameId={gameId} players={players.slice(-1)[0]?.players} startGame={startGame} started={started} nickname={nickname} />;
 }

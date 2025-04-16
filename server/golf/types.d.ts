@@ -1,5 +1,3 @@
-export type MoveHandlerFunction = (args: MoveData) => any;
-
 export type Player = {
     id: string;
     selectedCard: Card | null;
@@ -17,10 +15,21 @@ export type Card = {
 export type MoveData = {
     moveType: string;
     playerId: string;
-    currentPlayerId: string;
     cardIndex: number;
-    discards: Card[];
-    gameState: string;
-    actions: any;
     player: Player;
+}
+
+export type MoveContext = {
+    gameState: string;
+    currentPlayerId: string;
+    discards: Card[];
+    actions: MoveContextActions;
+    players: Record<string, Player>;
+}
+
+export type MoveContextActions = { 
+    gameState: (state: string) => void;
+    advancePlayer: () => void;
+    recalculateScore: (player?: Player) => void;
+    draw: () => Card;
 }

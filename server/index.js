@@ -2,7 +2,6 @@ import express from 'express';
 const app = express();
 // import {router} from './routes/router.js';
 import bodyParser from 'body-parser';
-import cors from 'cors';
 import http from 'http';
 import path from 'path';
 const __dirname = path.resolve();
@@ -63,6 +62,19 @@ io.on('connection', socket => {
                 console.error(`Room ${data.pin} does not exist.`);
             }
         });
+
+        socket.on('send-chat-message', (data) => {
+            console.log("Chat message received:", data);
+            const roomState = rooms[data.pin];
+            if (!roomState) return;
+
+            const player = roomState.players.find(p => p.socketIds.includes(socket.id));
+            if (!player) return;
+
+            console.log(`Chat message received in room ${data.pin} from player ${player.nickname}:`, data);
+            io.to(data.pin).emit('message-received', { playerId: player.playerId, nickname: player.nickname, message: data.message });
+        })
+
 
         socket.on('player-move', (data) => {
             console.log(`Player move received in room ${data.pin} from player ${socket.id}:`, data);

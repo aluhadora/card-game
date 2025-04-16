@@ -18,12 +18,11 @@ type CardProps = {
 
 export default function Card({ card, onClick, style, className, active, renderBackForNull = true, id } : CardProps) {
     if (!card) card = {imageName: renderBackForNull ? "back" : "card-base", value: 0};
-    if (card.name) card.imageName = card.name; // For backward compatibility with old card objects  
+    else if (card.name) card.imageName = card.name; 
 
     const cardName = card.imageName;
     return <div id={id} className={"card" + (className ? " " + className : "") + ( active ? " active" : "")}
         style={{backgroundImage: `url(/images/cards/${cardName}.png)`, ...style}}
         onClick={onClick}>
-        {/* <span className="card-value">{card.value > 0 ? card.value : "?"}</span> */}
     </div>
 }

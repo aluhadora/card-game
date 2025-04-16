@@ -1,6 +1,6 @@
-import MoveData from "../moveData";
+import { MoveContext, MoveData } from "../types";
 
-export default function acceptSelected({cardIndex, player, discards, actions} : MoveData) {
+export default function acceptSelected({cardIndex, player} : MoveData, { discards, actions } : MoveContext) {
     if (!player.selectedCard) {
         console.error("No selected card to accept!");
         return;

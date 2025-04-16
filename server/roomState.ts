@@ -1,12 +1,12 @@
 import GolfGame from "./golf/golfGameState.js";
-import { Participant } from "./types.js";
+import { Participant, Game } from "./types.js";
 
 export default class RoomState {
     hostId: string;
     roomstate: string;
     roomId: string;
     players: Participant[];
-    gameState: GolfGame;
+    gameState: Game;
     
     joinHost(data : { hostId: string, pin: string}) {
         this.hostId = data.hostId;
