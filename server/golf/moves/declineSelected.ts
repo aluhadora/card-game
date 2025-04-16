@@ -1,7 +1,7 @@
 import { GameStates } from "../constants";
-import MoveData from "../moveData";
+import { MoveContext, MoveData } from "../types";
 
-export default function declineSelected({player, actions, gameState, discards} : MoveData) {
+export default function declineSelected({ player } : MoveData, { actions, gameState, discards } : MoveContext) {
     if (!player.selectedCard) {
         console.error("No selected card to decline!");
         return;

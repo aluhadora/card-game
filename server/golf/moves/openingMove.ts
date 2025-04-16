@@ -1,7 +1,7 @@
 import { GameStates } from "../constants";
-import MoveData from "../moveData";
+import { MoveContext, MoveData } from "../types";
 
-export default function openingMove({ actions, cardIndex, player } : MoveData) {
+export default function openingMove({ cardIndex, player } : MoveData, { actions } : MoveContext) {
     player.playArea[cardIndex] = actions.draw(); // Place the accepted card in the player's play area
 
     actions.gameState(GameStates.FirstCard);

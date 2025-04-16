@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import './App.css'
 import io from 'socket.io-client';
 import ConnectionManager from './components/connectionManager';
-import Golf from './components/golf/golf';
-import AnimationHandler from './components/golf/animationHandler';
+import Golf from './games/golf/components/golf';
+import AnimationHandler from './games/golf/components/animationHandler';
 import { animationTime } from './logic/animationConfiguration';
+import MessagesPanel from './components/messagesPanel';
 
 export default function App() {
 
@@ -22,7 +23,7 @@ export default function App() {
     const [animationDeltas, setAnimationDeltas] = useState([]);
 
     const addPlayer = (playerData) => {
-        setMessages(messages => [...messages, playerData]);
+        setMessages(messages => [...messages, {playerJoined: playerData}]);
 
         const existingPlayer = players.find(player => player.id === playerData.id);
         if (existingPlayer) {
@@ -37,7 +38,7 @@ export default function App() {
     }
 
     const gameStarted = (data) => {
-        setMessages(messages => [...messages, data]);
+        setMessages(messages => [...messages, {gameStarted: data}]);
         setDeltas([data]); // Store the initial state
         setStarted(true);
     }
@@ -75,11 +76,18 @@ export default function App() {
         socket.on('room-joined', data => addPlayer(data));
         socket.on('game-started', gameStarted);
         socket.on('player-move', playerMoved);
+        socket.on('message-received', messageReceived);
+
         setConnected(true);
         setSocket(socket);
 
         const state = await getRoomState();
         if (state && state.roomstate !== "Lobby") setStarted(true);
+
+        socket.on('disconnect', () => {
+            console.log("Disconnected from server");
+            setConnected(false);
+        });
     }
 
     const setState = state => {
@@ -102,7 +110,16 @@ export default function App() {
             setState(state); // Store the new state
         }
 
-        // setMessages(messages => [...messages, state]);
+        setMessages(messages => [...messages, {playerMoved: state}]);
+    }
+
+    const sendMessage = (message) => {
+        console.log("Sending message:", message);
+        socket.emit("send-chat-message", { pin: gameId, playerId: playerId, message: message });
+    }
+
+    const messageReceived = (message) => {
+        setMessages(messages => [...messages, {messageReceived: message}]);
     }
 
     const playerMove = moveData => {
@@ -113,28 +130,19 @@ export default function App() {
     return (
         <div>
             <ConnectionManager gameId={gameId} setGameId={setGameId} joinGame={joinGame} players={players} playerId={playerId} connected={connected} started={started} startGame={startGame} />
-            {started && <GameBoard playerMove={playerMove} players={players} state={deltas[0]} playerId={playerId} />}
+            <GameBoard playerMove={playerMove} players={players} state={deltas[0]} playerId={playerId} started={started} />
             <AnimationHandler animationDeltas={animationDeltas} setAnimationDeltas={setAnimationDeltas} />
+            <MessagesPanel messages={messages} sendMessage={sendMessage} />
         </div>
     )
 }
 
-function GameBoard({playerMove, state, playerId}) {
+function GameBoard({playerMove, state, playerId, started}) {
+    if (!started) return null;
+
     if (!state) {
         return <div>Loading game state...</div>;
     }
-    if (state.gameState === "GameOver") {
-        console.log("Game Over state detected", state);
-        return <div>
-            Game Over! Thanks for playing!
-            <br />
-            {Object.values(state.players).map(player => (
-                <div key={player.id}>
-                    {player.nickname}: {player.score} points
-                </div>
-            ))}
-            <Golf gameState={state} playerId={playerId} />
-        </div>;
-    }
+
     return <Golf gameState={state} playerMove={playerMove} playerId={playerId} />
 }

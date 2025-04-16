@@ -1,7 +1,7 @@
 import { GameStates } from "../constants";
-import MoveData from "../moveData";
+import { MoveContext, MoveData } from "../types";
 
-export default function drawFromDeck({player, actions} : MoveData) {
+export default function drawFromDeck({player} : MoveData, { actions} : MoveContext) {
     if (player.selectedCard) {
         console.warn("Player already has a selected card. Cannot draw another one.");
         return;

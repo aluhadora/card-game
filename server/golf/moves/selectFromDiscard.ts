@@ -1,6 +1,6 @@
-import MoveData from "../moveData";
+import { MoveContext, MoveData } from "../types";
 
-export default function selectFromDiscard({ discards, player } : MoveData) {
+export default function selectFromDiscard({ player } : MoveData, { discards } : MoveContext) {
     const selectedCard = discards.pop(); // Draw the top card from the discard pile
     if (!selectedCard) {
         console.error("No card to draw from discard pile!");

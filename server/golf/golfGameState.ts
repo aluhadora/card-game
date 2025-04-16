@@ -1,6 +1,7 @@
+import { Game } from "../types";
 import { GameStates } from "./constants.ts";
 import MoveHandler from "./moveHandler.ts";
-import { Card, Player, MoveData } from "./types";
+import { Card, Player, MoveData, MoveContext, MoveContextActions } from "./types";
 
 class Deck {
     shuffledDeck : Card[];
@@ -38,8 +39,15 @@ class Deck {
         }
     }
 
-    draw() : Card | null {
-        return this.shuffledDeck.pop() || null; // Return null if the deck is empty
+    draw() : Card {
+        const card = this.shuffledDeck.pop();
+
+        if (!card) {
+            console.error("No cards left in the deck to draw from!");
+            return { name: "", score: 0 };
+        }
+
+        return card;
     }
 
     length () {
@@ -47,7 +55,7 @@ class Deck {
     }
 }
 
-export default class GolfGame {
+export default class GolfGame implements Game {
     players: Record<string, Player>;
     gameState: string;
     currentPlayerId : string | null;
@@ -201,20 +209,22 @@ export default class GolfGame {
     }
 
     playerMove(moveData : MoveData) : any | undefined {
-        const actions = {
+        const actions : MoveContextActions = {
             draw: this.deck.draw,
             recalculateScore: this.recalculateScore.bind(this),
             advancePlayer: this.advancePlayer.bind(this),
             gameState: this.advanceGameState.bind(this),
         };
 
-        const delta = this.moveHandler.handleMove({...moveData, 
-            actions,
-            player: this.players[moveData.playerId],
+        const context : MoveContext = {
             gameState: this.gameState,
-            discards: this.discards, 
-            currentPlayerId: this.currentPlayerId || ""
-        });
+            players: this.players,
+            currentPlayerId: this.currentPlayerId || "",
+            discards: this.discards,
+            actions: actions
+        }
+
+        const delta = this.moveHandler.handleMove(moveData, context);
 
         return this.visibleState(delta);
     }
