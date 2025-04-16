@@ -68,11 +68,8 @@ function PostConnectionHeader({ gameId, players, startGame, started, nickname })
 
     useEffect(() => {
         if (!players) return;
-        console.log("Recalculating decks based on players length", players);
         setGameSettings(settings => ({ ...settings, decks: Math.round(Object.keys(players).length / 2)}));
     }, [players]);
-
-    console.log("PostConnectionHeader", players, started);
 
     if (started || !players) return null;
 

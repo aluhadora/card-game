@@ -224,7 +224,7 @@ export default class GolfGame implements Game {
             actions: actions
         }
 
-        const delta = this.moveHandler.handleMove(moveData, context);
+        const delta = this.moveHandler.handleMove({...moveData, player: this.players[moveData.playerId]}, context);
 
         return this.visibleState(delta);
     }
