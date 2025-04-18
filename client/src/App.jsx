@@ -4,7 +4,7 @@ import io from 'socket.io-client';
 import ConnectionManager from './components/connectionManager';
 import { animationTime } from './logic/animationConfiguration';
 import MessagesPanel from './components/messagesPanel';
-import GameBoard from './components/GameBoard';
+import GameBoard from './components/gameBoard';
 import AnimationHandler from './games/common/components/animationHandler';
 
 export default function App() {
