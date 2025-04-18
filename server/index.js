@@ -107,7 +107,8 @@ app.get('/api/rooms/:pin', (req, res) => {
                 id: player.playerId,
                 nickname: player.nickname,
             })),
-            gameState: rooms[pin].gameState.visibleState()
+            gameState: rooms[pin].gameState.visibleState(),
+            gameType: rooms[pin].gameType,
         });
     } else {
         res.status(404).json({ message: "Room not found" });

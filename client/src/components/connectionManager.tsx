@@ -64,7 +64,7 @@ function LobbyHeader({ gameId, players, startGame, nickname }) {
 }
 
 function PostConnectionHeader({ gameId, players, startGame, started, nickname }) {
-    const [gameSettings, setGameSettings] = useState({ decks: 1, type: "golf" });
+    const [gameSettings, setGameSettings] = useState({ decks: 1, gameType: "golf" });
 
     useEffect(() => {
         if (!players) return;
@@ -80,8 +80,9 @@ function PostConnectionHeader({ gameId, players, startGame, started, nickname })
                 <div>
                     <label>
                         Game Type:
-                        <select value={gameSettings.type} onChange={e => setGameSettings({ ...gameSettings, type: e.target.value })}>
+                        <select value={gameSettings.gameType} onChange={e => setGameSettings({ ...gameSettings, gameType: e.target.value })}>
                             <option value="golf">Golf</option>
+                            <option value="garbage">Garbage</option>
                         </select>
                     </label>
                 </div>

@@ -12,7 +12,7 @@ function players(gameState : GameState, playerId : string) : Player[] {
     return [...players.slice(index), ...players.slice(0, index)];
 }
 
-type GolfProps = {
+type GarbageGameProps = {
     gameState: GameState | null;
     playerMove: (move: MoveData) => void;
     playerId: string;
@@ -20,10 +20,6 @@ type GolfProps = {
 
 function isActive(gameState : GameState, playerId : string) : boolean {
     if (gameState.gameState === GameStates.GameOver) return false;
-    
-    if (gameState.gameState === GameStates.Opening) {
-        return gameState?.players[playerId]?.playArea.filter(card => card !== null).length < 2;
-    }
 
     return gameState.currentPlayerId === playerId;
 }
@@ -42,15 +38,13 @@ function GameOverHeader({gameState} : {gameState: GameState | null}) {
     </div>;
 }
 
-function discardClick(gameState: GameState, playerMove: (move: MoveData) => void, selectedCard: CardData | null) {
-    if (!gameState || gameState.gameState === GameStates.Opening) return; 
+
+function discardClick(playerMove: (move: MoveData) => void, selectedCard: CardData | null) {
 
     if (selectedCard) {
         playerMove({ moveType: MoveTypes.DeclineSelected }); 
         return;
     }
-
-    if (gameState.gameState === GameStates.SecondCard) return;
 
     playerMove({ moveType: MoveTypes.SelectFromDiscard });
 }
@@ -58,19 +52,17 @@ function discardClick(gameState: GameState, playerMove: (move: MoveData) => void
 function deckClick (gameState: GameState, playerMove: (move: MoveData) => void, playerId: string) {
     const active = gameState.currentPlayerId === playerId;
 
-    if (!gameState || gameState.gameState === GameStates.Opening || !active) return;
+    if (!gameState || !active) return;
 
-    playerMove({ moveType: gameState.gameState === GameStates.FirstCard 
-        ? MoveTypes.DrawFromDeck 
-        : MoveTypes.DeclineSelected }); 
+    playerMove({ moveType: MoveTypes.DrawFromDeck}); 
 }
 
-function GolfDeckArea({ state, playerMove, playerId, selectedCard }) {
+function GarbageDeckArea({ state, playerMove, playerId, selectedCard }) {
     if (!state) return null;
 
     return (
         <DeckArea
-            discardClick={() => discardClick(state, playerMove, selectedCard)}
+            discardClick={() => discardClick(playerMove, selectedCard)}
             deckClick={() => deckClick(state, playerMove, playerId)}
             remainingCards={state.remainingCards}
             discardPile={state.discardPile}
@@ -79,7 +71,7 @@ function GolfDeckArea({ state, playerMove, playerId, selectedCard }) {
     );
 }
 
-export default function Golf({ gameState, playerMove, playerId } : GolfProps) {
+export default function GarbageGame({ gameState, playerMove, playerId } : GarbageGameProps) {
     if (!gameState) return null;
 
     const sortedPlayers = players(gameState, playerId);
@@ -89,7 +81,7 @@ export default function Golf({ gameState, playerMove, playerId } : GolfProps) {
             <GameOverHeader gameState={gameState} />
             <div className="game-board">
                 <div>
-                    <GolfDeckArea state={gameState} playerMove={playerMove} playerId={playerId} selectedCard={sortedPlayers[0].selectedCard}/>
+                    <GarbageDeckArea state={gameState} playerMove={playerMove} playerId={playerId} selectedCard={sortedPlayers[0].selectedCard}/>
                     <PlayerArea
                         player={sortedPlayers[0]}
                         gameState={gameState}

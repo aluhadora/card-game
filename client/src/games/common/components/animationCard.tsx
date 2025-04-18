@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Card from "../../../components/card";
+import Card from "./card";
 import { animationTime } from "../../../logic/animationConfiguration";
 import React from "react";
 import { AnimationDelta, CardData } from "../types";

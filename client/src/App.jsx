@@ -2,10 +2,10 @@ import { useState } from 'react';
 import './App.css'
 import io from 'socket.io-client';
 import ConnectionManager from './components/connectionManager';
-import Golf from './games/golf/components/golf';
-import AnimationHandler from './games/golf/components/animationHandler';
 import { animationTime } from './logic/animationConfiguration';
 import MessagesPanel from './components/messagesPanel';
+import GameBoard from './components/GameBoard';
+import AnimationHandler from './games/common/components/animationHandler';
 
 export default function App() {
 
@@ -20,6 +20,11 @@ export default function App() {
     const [socket, setSocket] = useState(null);
     const [deltas, setDeltas] = useState([]); // For tracking game state changes if needed
 
+    const updateQuery = (newParams) => {
+        const newUrl = `${window.location.pathname}?${newParams.toString()}`;
+        window.history.pushState({}, '', newUrl);
+    };
+  
     const [animationDeltas, setAnimationDeltas] = useState([]);
 
     const addPlayer = (playerData) => {
@@ -61,6 +66,15 @@ export default function App() {
     }
 
     const joinGame = async (nickname, playerId, playerSecret) => {
+        if (!gameId || !gameId.trim().length) {
+            console.error("Game ID is not set. Cannot start game.");
+            return;
+        }
+
+        const newParams = new URLSearchParams();
+        newParams.set('pin', gameId);
+        updateQuery(newParams);
+
         const serverUrl = import.meta.env.VITE_SERVER_URL || "/";
         console.log("server url", serverUrl);
         console.log("Joining game with ID:", gameId);
@@ -135,14 +149,4 @@ export default function App() {
             <MessagesPanel messages={messages} sendMessage={sendMessage} />
         </div>
     )
-}
-
-function GameBoard({playerMove, state, playerId, started}) {
-    if (!started) return null;
-
-    if (!state) {
-        return <div>Loading game state...</div>;
-    }
-
-    return <Golf gameState={state} playerMove={playerMove} playerId={playerId} />
 }

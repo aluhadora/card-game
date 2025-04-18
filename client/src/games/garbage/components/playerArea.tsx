@@ -73,13 +73,15 @@ function PlayerAreaCard({ player, index, cardClick, active, isUs } : CardProps) 
 
 function PlayerAreaRows({ player, cardClick, active, isUs } : CardRowProps) {
     return player.playArea.map((_, index) => {
-        if (index % 3 !== 0) return null;
+        if (index % 5 !== 0) return null;
 
         return (
             <tr key={index}>
                 <PlayerAreaCard player={player} index={index} cardClick={cardClick} active={active} isUs={isUs} />
                 <PlayerAreaCard player={player} index={index+1} cardClick={cardClick} active={active} isUs={isUs} />
                 <PlayerAreaCard player={player} index={index+2} cardClick={cardClick} active={active} isUs={isUs} />
+                <PlayerAreaCard player={player} index={index+3} cardClick={cardClick} active={active} isUs={isUs} />
+                <PlayerAreaCard player={player} index={index+4} cardClick={cardClick} active={active} isUs={isUs} />
             </tr>
         );
     });
@@ -88,12 +90,7 @@ function PlayerAreaRows({ player, cardClick, active, isUs } : CardRowProps) {
 export default function PlayerArea({ player, gameState, playerMove, active, isUs, selectedCard } : PlayerAreaProps) {
 
     const cardClick = (index : number) => {
-        if (gameState.gameState === GameStates.Opening) {
-            playerMove({moveType: MoveTypes.OpeningMove, cardIndex: index}); // Accepting the first two cards in opening state
-            return;
-        }
-
-        if (!active || !isUs) return;
+        if (!active || !isUs || !selectedCard) return;
 
         playerMove({ moveType: MoveTypes.AcceptSelected, cardIndex: index });
     }

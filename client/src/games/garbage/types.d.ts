@@ -8,7 +8,6 @@ export type Player = {
     nickname: string;
     index: number,
 }
-
 export type MoveData = {
     moveType: string;
     cardIndex?: number | undefined;
@@ -22,5 +21,4 @@ export type GameState = {
     remainingCards: number;
     deckLength: number;
     totalUnrevealedCards: number;
-    gameType: string;
 }

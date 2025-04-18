@@ -11,7 +11,6 @@ class Deck {
             "heart_1", "heart_2", "heart_3", "heart_4", "heart_5", "heart_6", "heart_7", "heart_8", "heart_9", "heart_10", "heart_jack", "heart_queen", "heart_king",
             "club_1", "club_2", "club_3", "club_4", "club_5", "club_6", "club_7", "club_8", "club_9", "club_10", "club_jack", "club_queen", "club_king",
             "diamond_1", "diamond_2", "diamond_3", "diamond_4", "diamond_5", "diamond_6", "diamond_7", "diamond_8", "diamond_9", "diamond_10", "diamond_jack", "diamond_queen", "diamond_king",
-            "joker_black", "joker_red"
         ];
 
         const decks : Card[] = [];
@@ -25,13 +24,9 @@ class Deck {
     }
 
     scoreCard(cardName : string) : number {
-        if (cardName.startsWith("joker")) return -2;
-
         const value = cardName.split("_")[1];
-        if (value === "jack") {
-            return 10;
-        } else if (value === "queen" || value === "joker") {
-            return -2;
+        if (value === "jack" || value === "queen") {
+            return -1;
         } else if (value === "king") {
             return 0;
         } else {
@@ -55,7 +50,7 @@ class Deck {
     }
 }
 
-export default class GolfGame implements Game {
+export default class GarbageGame implements Game {
     players: Record<string, Player>;
     gameState: string;
     currentPlayerId : string | null;
@@ -85,7 +80,7 @@ export default class GolfGame implements Game {
             remainingCards: this.deck.length() - this.totalUnrevealedCards(),
             deckLength: this.deck.length(),
             totalUnrevealedCards: this.totalUnrevealedCards(),
-            gameType: "golf",
+            gameType: "garbage",
             ...extraData
         };
     }
@@ -98,7 +93,7 @@ export default class GolfGame implements Game {
             this.players[playerId] = {
                 id: playerId,
                 nickname: playerName,
-                playArea: [null, null, null, null, null, null, null, null, null],
+                playArea: [null, null, null, null, null, null, null, null, null, null],
                 score: 0,
                 index: 0,
                 selectedCard: null
@@ -120,7 +115,7 @@ export default class GolfGame implements Game {
 
         const firstCard = this.deck.draw();
 
-        if (firstCard) this.discards.push(firstCard); // Draw the first card from the deck to start the discard pile
+        this.discards.push(firstCard); // Draw the first card from the deck to start the discard pile
 
         return this.visibleState();
     }
@@ -180,8 +175,25 @@ export default class GolfGame implements Game {
         const nextIndex = (currentIndex + 1) % allPlayers.length || 0;
 
         const nextPlayer = allPlayers.find(player => player.index === nextIndex);
+        if (allPlayers.every(player => player.roundOver)) {
+            this.gameState = GameStates.GameOver;
+            console.log("Game Over! All players have completed their rounds.");
+
+            // Reveal all remaining cards
+            allPlayers.forEach(player => {
+                player.playArea = player.playArea.map(card => card || this.deck.draw()); // Draw new cards for any empty slots
+                this.recalculateScore(player);
+            });
+            console.log("Game Over! Scores:", this.players);
+            return;
+        }
+
+        if (nextPlayer?.roundOver) {
+            this.advancePlayer();
+            return;
+        }
+
         this.currentPlayerId = nextPlayer?.id || "";
-        this.gameState = GameStates.FirstCard;
 
         // If the next player has no cards left, we need to check if the game is over
         if (nextPlayer?.playArea.every(card => card !== null) || this.deck.length() <= this.totalUnrevealedCards()) {
@@ -196,25 +208,10 @@ export default class GolfGame implements Game {
         }
     }
 
-    advanceGameState(state : string) {
-        console.log("Moving to state", state);
-        if (this.gameState === GameStates.Opening) {
-            if (this.allPlayers().every(player => player.playArea.filter(card => card !== null).length >= 2)) {
-                console.log("Advancing", this.allPlayers());
-                this.gameState = GameStates.FirstCard;
-            }
-        } else {
-            this.gameState = state;
-        }
-        return this.visibleState();
-    }
-
     playerMove(moveData : MoveData) : any | undefined {
         const actions : MoveContextActions = {
             draw: this.deck.draw,
-            recalculateScore: this.recalculateScore.bind(this),
             advancePlayer: this.advancePlayer.bind(this),
-            gameState: this.advanceGameState.bind(this),
         };
 
         const context : MoveContext = {
