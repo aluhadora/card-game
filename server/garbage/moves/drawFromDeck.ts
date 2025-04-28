@@ -1,4 +1,3 @@
-import { GameStates } from "../constants";
 import { MoveContext, MoveData } from "../types";
 
 export default function drawFromDeck({player} : MoveData, { actions} : MoveContext) {
@@ -14,7 +13,6 @@ export default function drawFromDeck({player} : MoveData, { actions} : MoveConte
     }
 
     player.selectedCard = drawnCard;
-    actions.gameState(GameStates.SecondCard);
 
     return { 
         delta: { 

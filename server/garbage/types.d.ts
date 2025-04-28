@@ -5,6 +5,7 @@ export type Player = {
     score: number;
     nickname: string;
     index: number,
+    roundOver?: boolean;
 }
 
 export type Card = {
@@ -28,8 +29,6 @@ export type MoveContext = {
 }
 
 export type MoveContextActions = { 
-    gameState: (state: string) => void;
     advancePlayer: () => void;
-    recalculateScore: (player?: Player) => void;
     draw: () => Card;
 }

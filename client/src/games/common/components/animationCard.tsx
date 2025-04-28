@@ -1,10 +1,20 @@
 import { useEffect, useState } from "react";
-import Card from "../card";
-import { animationTime } from "../../logic/animationConfiguration";
+import Card from "./card";
+import { animationTime } from "../../../logic/animationConfiguration";
+import React from "react";
+import { AnimationDelta, CardData } from "../types";
 
-export default function AnimationCard({ animateCard, card, from, to, duration = animationTime }) {
+type AnimationCardProps = {
+    animateCard: AnimationDelta | null;
+    card: CardData | null;
+    from?: { left: number; top: number; width: number; height: number } | null;
+    to?: { left: number; top: number; width: number } | null;
+    duration?: number;
+}
 
-    const initialStyle = {
+export default function AnimationCard({ animateCard, card, from, to, duration = animationTime } : AnimationCardProps) {
+
+    const initialStyle : React.CSSProperties = {
         position: 'absolute',
         left: from?.left,
         top: from?.top,
@@ -56,7 +66,7 @@ export default function AnimationCard({ animateCard, card, from, to, duration = 
                     width: from?.width,
                     height: from?.height,
                     transition: animateCard ? `transform ${duration}ms ease-in-out` : 'none',
-                    transform: `translate(${to?.left - from?.left}px, ${to?.top - from?.top}px) scale(${scale})`,
+                    transform: `translate(${(to?.left || 0) - (from?.left || 0)}px, ${(to?.top || 0) - (from?.top || 0)}px) scale(${scale})`,
                     display: 'block',
                     opacity: 1
                 }));
@@ -72,7 +82,7 @@ export default function AnimationCard({ animateCard, card, from, to, duration = 
             className="animation-card"
             style={style}
         >
-            <Card card={card} className={from?.width > 25 ? "" : "small"}/>
+            <Card card={card} className={(from?.width || 0) > 25 ? "" : "small"}/>
         </div>
     );
 }

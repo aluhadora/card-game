@@ -1,9 +1,9 @@
 import { GameStates } from "./constants";
-import { MoveData } from "./types";
+import { MoveContext, MoveData } from "./types";
 
 export default class MoveValidator {
 
-    validateOpeningStatePlayerMove({gameState, player, cardIndex, playerId} : MoveData) : boolean {
+    validateOpeningStatePlayerMove({ player, cardIndex, playerId }: MoveData, { gameState }: MoveContext) : boolean {
         if (gameState !== GameStates.Opening) return true;
 
         if (!player) return false;
@@ -23,7 +23,7 @@ export default class MoveValidator {
         return true;
     }
 
-    validatePlayerTurn({gameState, playerId, currentPlayerId} : MoveData) : boolean {
+    validatePlayerTurn({ playerId }: MoveData, { gameState, currentPlayerId }: MoveContext) : boolean {
         if (gameState === GameStates.Opening) return true;
 
         if (currentPlayerId !== playerId) {
@@ -33,8 +33,8 @@ export default class MoveValidator {
         return true;
     }
 
-    validateMove(moveData : MoveData) {
-        return this.validateOpeningStatePlayerMove(moveData)
-            && this.validatePlayerTurn(moveData);
+    validateMove(moveData : MoveData, context : MoveContext) : boolean {
+        return this.validateOpeningStatePlayerMove(moveData, context)
+            && this.validatePlayerTurn(moveData, context);
     }
 }

@@ -1,12 +1,14 @@
+import GarbageGame from "./garbage/garbageGame.js";
 import GolfGame from "./golf/golfGameState.js";
-import { Participant } from "./types.js";
+import { Participant, Game } from "./types.js";
 
 export default class RoomState {
     hostId: string;
     roomstate: string;
     roomId: string;
     players: Participant[];
-    gameState: GolfGame;
+    gameState: Game;
+    gameType: string;
     
     joinHost(data : { hostId: string, pin: string}) {
         this.hostId = data.hostId;
@@ -58,6 +60,26 @@ export default class RoomState {
             return;
         }
         this.roomstate = "Running";
+
+        console.log("Starting Room:", this.roomId, "with data:", data);
+        this.gameType = data.gameType || "golf";
+
+        if (data.gameType === "golf" || !data.gameType) {
+            this.gameState = new GolfGame();
+        } else if (data.gameType === "garbage") {
+            this.gameState = new GarbageGame();
+        }
+
+        this.players.forEach(player => {
+            this.gameState.addPlayer({
+                playerId: player.playerId,
+                nickname: player.nickname,
+                socketId: player.socketIds[0],
+                playerSecret: player.playerSecret,
+                roomId: this.roomId
+            });
+        });
+
         return this.gameState.startGame(data);
     }
 

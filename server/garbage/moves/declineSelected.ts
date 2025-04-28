@@ -1,7 +1,6 @@
-import { GameStates } from "../constants";
 import { MoveContext, MoveData } from "../types";
 
-export default function declineSelected({ player } : MoveData, { actions, gameState, discards } : MoveContext) {
+export default function declineSelected({ player } : MoveData, { actions, discards } : MoveContext) {
     if (!player.selectedCard) {
         console.error("No selected card to decline!");
         return;
@@ -10,10 +9,7 @@ export default function declineSelected({ player } : MoveData, { actions, gameSt
     discards.push(player.selectedCard);
     player.selectedCard = null;
 
-    if (gameState !== GameStates.FirstCard) {
-        actions.recalculateScore();
-        actions.advancePlayer();
-    }
+    actions.advancePlayer();
 
     return { 
         delta: { 
