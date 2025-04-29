@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 type PlayerJoinedMessage = {
     playerJoined: {
@@ -108,12 +108,18 @@ function Panel({ messages, sendMessage, showMessages }: { messages: any[]; sendM
 
 export default function MessagesPanel({ messages, sendMessage }: { messages: any[]; sendMessage: (message: string) => void }) {
     const [showMessages, setShowMessages] = useState<boolean>(false);
+    const [viewedMessages, setViewedMessages] = useState<any[]>(messages);
 
     if (!messages || messages.length === 0) return null;
-
+    useEffect(() => {
+        if (showMessages) {
+            setViewedMessages(messages);
+        }
+        console.log(messages);
+    });
     return (
         <>
-            <div className={`messages-button ${showMessages ? "open" : "closed"}`} onClick={() => setShowMessages(!showMessages)}>
+            <div className={`messages-button ${showMessages ? "open" : "closed"} ${messages.length === viewedMessages.length ?"read" : "unread"}`} onClick={() => setShowMessages(!showMessages)}>
                 ❯
             </div>
             <Panel messages={messages} sendMessage={sendMessage} showMessages={showMessages} />
