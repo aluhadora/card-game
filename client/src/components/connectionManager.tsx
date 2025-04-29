@@ -68,7 +68,7 @@ function PostConnectionHeader({ gameId, players, startGame, started, nickname })
 
     useEffect(() => {
         if (!players) return;
-        setGameSettings(settings => ({ ...settings, decks: Math.round(Object.keys(players).length / 2)}));
+        setGameSettings(settings => ({ ...settings, decks: Math.round(Object.keys(players).length / 1)}));
     }, [players]);
 
     if (started || !players) return null;
@@ -88,7 +88,7 @@ function PostConnectionHeader({ gameId, players, startGame, started, nickname })
                 </div>
                 <div>
                     <label>
-                        Number of Decks (recommended min: {Math.round(Object.keys(players).length / 2)}):
+                        Number of Decks (recommended min: {Math.round(Object.keys(players).length / 1)}):
                         <input type='number' min={1} max={10} value={gameSettings.decks} onChange={e => setGameSettings({ ...gameSettings, decks: parseInt(e.target.value) })} />
                     </label>
                 </div>
