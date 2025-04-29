@@ -110,13 +110,15 @@ export default function MessagesPanel({ messages, sendMessage }: { messages: any
     const [showMessages, setShowMessages] = useState<boolean>(false);
     const [viewedMessages, setViewedMessages] = useState<any[]>(messages);
 
-    if (!messages || messages.length === 0) return null;
     useEffect(() => {
         if (showMessages) {
             setViewedMessages(messages);
         }
         console.log(messages);
-    });
+    }, [messages,viewedMessages,showMessages,setViewedMessages]);
+
+    if (!messages || messages.length === 0) return null;
+
     return (
         <>
             <div className={`messages-button ${showMessages ? "open" : "closed"} ${messages.length === viewedMessages.length ?"read" : "unread"}`} onClick={() => setShowMessages(!showMessages)}>
