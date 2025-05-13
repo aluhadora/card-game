@@ -1,6 +1,7 @@
 import { Game } from "../types";
 import { GameStates } from "./constants.ts";
 import MoveHandler from "./moveHandler.ts";
+import calculateScore from "./scoreService.ts";
 import { Card, Player, MoveData, MoveContext, MoveContextActions } from "./types";
 
 class Deck {
@@ -133,42 +134,8 @@ export default class GolfGame implements Game {
 
     recalculateScore(player : Player | null) {
         const currentPlayer = player || this.players[this.currentPlayerId || 0];
-        const hand = currentPlayer.playArea.map(card => this.scoreCard(card));
-        
-        let score = hand.reduce((acc, card) => {
-            if (card) {
-                return acc + card;
-            }
-            return acc;
-        }, 0);
 
-        // Zero out rows of same score
-        for (let i = 0; i <= 2; i++) {
-            if (hand[i*3] && hand[i*3] > 0 && (hand[i*3] === hand[i*3+1] && hand[i*3] === hand[i*3+2])) {
-                score -= 3 * hand[i*3];
-            }
-        }
-
-        // Zero out columns of same score
-        for (let i = 0; i <= 2; i++) {
-            if (hand[i] && hand[i] > 0 && (hand[i] === hand[i+3] && hand[i] === hand[i+6])) {
-                score -= 3 * hand[i];
-            }
-        }
-
-        for (let i = 0; i <= 9; i++) {
-            // card i is in a row of identical cards or i is in a column of identical cards zero out it's score
-            if (hand[i] <= 0) continue;
-
-            for (let j = 0; j <= 2; j++) {
-                const row = i / 3;
-                if (hand[i] != hand[row + j]) continue; 
-            }
-            if (hand[i] && hand[i] > 0 && (hand[i] === hand[Math.floor(i/3)*3] || hand[i] === hand[i%3])) {
-                score -= hand[i];
-            }
-        }
-
+        const score = calculateScore(currentPlayer);
         currentPlayer.score = score;
     }
 

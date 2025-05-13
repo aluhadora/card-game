@@ -1,13 +1,13 @@
 import { Card, Player } from "./types";
 
-function areAllMyRowMatesEqual(i : number, hand : Card[]) : boolean {
+function areAllMyRowMatesEqual(i : number, hand : (Card | null)[]) : boolean {
     if (hand[i] === null) return false;
 
     const row = Math.floor(i / 3);
 
-    return hand[i].rank === hand[row * 3].rank 
-        && hand[i].rank === hand[row * 3 + 1].rank 
-        && hand[i].rank === hand[row * 3 + 2].rank;
+    return hand[i].rank === hand[row * 3]?.rank 
+        && hand[i].rank === hand[row * 3 + 1]?.rank 
+        && hand[i].rank === hand[row * 3 + 2]?.rank;
 }
 
 function areAllMyColumnMatesEqual(i : number, hand : Card[]) : boolean {
@@ -21,12 +21,11 @@ function areAllMyColumnMatesEqual(i : number, hand : Card[]) : boolean {
 }
 
 function scoreCard(card : Card | null) : number {
-    return card ? card.score : 0;
+    return card?.score || 0;
 }
 
-export default function recalculateScore(player : Player | null) {
-    const currentPlayer = player || this.players[this.currentPlayerId || 0];
-    const hand : Card[] = currentPlayer.playArea;
+export default function calculateScore(player : Player) {
+    const hand = player.playArea;
     
     let score = hand.reduce((acc, card) => {
         if (card) {
@@ -42,6 +41,6 @@ export default function recalculateScore(player : Player | null) {
         }
     }
 
-    currentPlayer.score = score;
+    return score;
 }
 
