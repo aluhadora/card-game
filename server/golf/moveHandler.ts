@@ -8,9 +8,11 @@ import MoveValidator from "./moveValidator";
 import { MoveContext, MoveData } from "./types";
 
 
+type MoveFunction = (moveData: MoveData, context: MoveContext) => {} | undefined;
+
 export default class MoveHandler {
     moveValidator: MoveValidator;
-    moveDictionary: Record<string, (moveData: MoveData, context : MoveContext) => {} | undefined>;
+    moveDictionary: Record<string, MoveFunction>;
 
     constructor() {
         this.moveValidator = new MoveValidator();

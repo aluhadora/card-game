@@ -10,6 +10,7 @@ export type Player = {
 export type Card = {
     score: number;
     name: string;
+    rank: string;
 }
 
 export type MoveData = {

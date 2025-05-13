@@ -16,7 +16,9 @@ class Deck {
 
         const decks : Card[] = [];
         for (let i = 0; i < numberOfDecks; i++) {
-            decks.push(...cardNames.map(name => ({ name, score: this.scoreCard(name) })));
+            decks.push(...cardNames.map(name => ({ name, 
+                score: this.scoreCard(name), 
+                rank: name.split("_")[1]})));
         }
 
         // shuffle the deck
@@ -44,7 +46,7 @@ class Deck {
 
         if (!card) {
             console.error("No cards left in the deck to draw from!");
-            return { name: "", score: 0 };
+            return { name: "", score: 0, rank: "" }; // Return a default card or handle the case as needed
         }
 
         return card;
@@ -151,6 +153,19 @@ export default class GolfGame implements Game {
         for (let i = 0; i <= 2; i++) {
             if (hand[i] && hand[i] > 0 && (hand[i] === hand[i+3] && hand[i] === hand[i+6])) {
                 score -= 3 * hand[i];
+            }
+        }
+
+        for (let i = 0; i <= 9; i++) {
+            // card i is in a row of identical cards or i is in a column of identical cards zero out it's score
+            if (hand[i] <= 0) continue;
+
+            for (let j = 0; j <= 2; j++) {
+                const row = i / 3;
+                if (hand[i] != hand[row + j]) continue; 
+            }
+            if (hand[i] && hand[i] > 0 && (hand[i] === hand[Math.floor(i/3)*3] || hand[i] === hand[i%3])) {
+                score -= hand[i];
             }
         }
 

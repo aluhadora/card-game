@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 
+type Message = PlayerJoinedMessage | PlayerMovedMessage | ChatMessage | GameStartedMessage;
+
 type PlayerJoinedMessage = {
     playerJoined: {
             playerId: string;
@@ -18,7 +20,7 @@ function PlayerJoinedMessage({ message }: { message: PlayerJoinedMessage }) {
 
 type PlayerMovedMessage = {
     playerMoved: {
-            playerId: string;
+            nickname: string;
             moveType: string;
             cardIndex?: number;
     };
@@ -27,7 +29,7 @@ type PlayerMovedMessage = {
 function PlayerMovedMessage({ message }: { message: PlayerMovedMessage }) {
     return (
         <div className="message player-moved">
-            {message.playerMoved.playerId} made a move: {message.playerMoved.moveType}
+            {message.playerMoved.nickname} made a move: {message.playerMoved.moveType}
             {message.playerMoved.cardIndex !== undefined && ` (Card Index: ${message.playerMoved.cardIndex})`}
         </div>
     );
@@ -80,7 +82,7 @@ function Message({ message }: { message: any }) {
     );
 }
 
-function Panel({ messages, sendMessage, showMessages }: { messages: any[]; sendMessage: (message: string) => void; showMessages: boolean }) {
+function Panel({ messages, sendMessage, showMessages }: { messages: Message[]; sendMessage: (message: string) => void; showMessages: boolean }) {
     const [messageText, setMessageText] = useState<string>("");
 
     if (!showMessages) return null;
@@ -109,6 +111,8 @@ function Panel({ messages, sendMessage, showMessages }: { messages: any[]; sendM
 export default function MessagesPanel({ messages, sendMessage }: { messages: any[]; sendMessage: (message: string) => void }) {
     const [showMessages, setShowMessages] = useState<boolean>(false);
 
+    const blah = "foo";
+    
     if (!messages || messages.length === 0) return null;
 
     return (
