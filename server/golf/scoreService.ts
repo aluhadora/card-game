@@ -1,23 +1,23 @@
 import { Card, Player } from "./types";
 
 function areAllMyRowMatesEqual(i : number, hand : (Card | null)[]) : boolean {
-    if (hand[i] === null) return false;
+    if (!hand[i] || scoreCard(hand[i]) <= 0) return false;
 
     const row = Math.floor(i / 3);
 
-    return hand[i].rank === hand[row * 3]?.rank 
+    return hand[i].rank === hand[row * 3]?.rank
         && hand[i].rank === hand[row * 3 + 1]?.rank 
         && hand[i].rank === hand[row * 3 + 2]?.rank;
 }
 
-function areAllMyColumnMatesEqual(i : number, hand : Card[]) : boolean {
-    if (hand[i] === null) return false;
+function areAllMyColumnMatesEqual(i : number, hand : (Card | null)[]) : boolean {
+    if (!hand[i] || scoreCard(hand[i]) <= 0) return false;
 
     const column = i % 3;
 
-    return hand[i].rank === hand[column].rank
-        && hand[i].rank === hand[column + 3].rank
-        && hand[i].rank === hand[column + 6].rank;  
+    return hand[i].rank === hand[column]?.rank
+        && hand[i].rank === hand[column + 3]?.rank
+        && hand[i].rank === hand[column + 6]?.rank;  
 }
 
 function scoreCard(card : Card | null) : number {

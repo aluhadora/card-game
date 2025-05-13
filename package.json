@@ -6,6 +6,7 @@
   "main": "server/index.js",
   "scripts": {
     "test": "jest",
+    "test-watch": "jest --watch",
     "start": "npx tsx server/index.js",
     "build": "cd client && npm install && vite build"
   },
@@ -24,12 +25,15 @@
     "vite": "^6.2.4"
   },
   "devDependencies": {
+    "@babel/core": "^7.27.1",
     "@babel/preset-env": "^7.27.2",
     "@eslint/js": "^9.25.1",
+    "@jest/globals": "^29.7.0",
     "@types/jest": "^29.5.14",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
+    "babel-jest": "^29.7.0",
     "eslint": "^9.25.1",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.1.0",
