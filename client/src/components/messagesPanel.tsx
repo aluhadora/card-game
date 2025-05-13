@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 type Message = PlayerJoinedMessage | PlayerMovedMessage | ChatMessage | GameStartedMessage;
 
@@ -110,6 +110,14 @@ function Panel({ messages, sendMessage, showMessages }: { messages: Message[]; s
 
 export default function MessagesPanel({ messages, sendMessage }: { messages: any[]; sendMessage: (message: string) => void }) {
     const [showMessages, setShowMessages] = useState<boolean>(false);
+    const [viewedMessages, setViewedMessages] = useState<any[]>(messages);
+
+    useEffect(() => {
+        if (showMessages) {
+            setViewedMessages(messages);
+        }
+        console.log(messages);
+    }, [messages,viewedMessages,showMessages,setViewedMessages]);
 
     const blah = "foo";
     
@@ -117,7 +125,7 @@ export default function MessagesPanel({ messages, sendMessage }: { messages: any
 
     return (
         <>
-            <div className={`messages-button ${showMessages ? "open" : "closed"}`} onClick={() => setShowMessages(!showMessages)}>
+            <div className={`messages-button ${showMessages ? "open" : "closed"} ${messages.length === viewedMessages.length ?"read" : "unread"}`} onClick={() => setShowMessages(!showMessages)}>
                 ❯
             </div>
             <Panel messages={messages} sendMessage={sendMessage} showMessages={showMessages} />
