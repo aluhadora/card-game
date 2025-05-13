@@ -8,6 +8,13 @@
     "start": "node index.js",
     "build": "cd client && npm install && npm run build"
   },
+  "jest": {
+    "transform": {
+      "^.+\\.ts?$": "babel-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.ts?$",
+    "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"]
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

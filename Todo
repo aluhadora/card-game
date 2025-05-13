@@ -12,5 +12,16 @@ Messages Panel
     Debugging Events/State
 Would love to move sockets from App
     Maybe useGameSockets hook with a listener dictionary, "event-key": [listeners]
-Some constants to kill magic strings
-Move to typeScript
+
+EndGame State
+    You can choose to flip the cards or take from deck or discard (limited to one)
+    In Endgame State change color around remaining players play area
+    When one player turns over cards move to EndGame State
+
+Restarting game from gameover screen
+Keep track of score between games
+
+Settings
+    +  When your turn happens option to notify player
+        Sound/Toast notification
+    https://blog.bitsrc.io/how-to-use-desktop-notifications-with-react-122536954dc2

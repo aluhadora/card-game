@@ -1,6 +1,7 @@
 import { Game } from "../types";
 import { GameStates } from "./constants.ts";
 import MoveHandler from "./moveHandler.ts";
+import calculateScore from "./scoreService.ts";
 import { Card, Player, MoveData, MoveContext, MoveContextActions } from "./types";
 
 class Deck {
@@ -16,7 +17,9 @@ class Deck {
 
         const decks : Card[] = [];
         for (let i = 0; i < numberOfDecks; i++) {
-            decks.push(...cardNames.map(name => ({ name, score: this.scoreCard(name) })));
+            decks.push(...cardNames.map(name => ({ name, 
+                score: this.scoreCard(name), 
+                rank: name.split("_")[1]})));
         }
 
         // shuffle the deck
@@ -44,7 +47,7 @@ class Deck {
 
         if (!card) {
             console.error("No cards left in the deck to draw from!");
-            return { name: "", score: 0 };
+            return { name: "", score: 0, rank: "" }; // Return a default card or handle the case as needed
         }
 
         return card;
@@ -132,29 +135,8 @@ export default class GolfGame implements Game {
 
     recalculateScore(player : Player | null) {
         const currentPlayer = player || this.players[this.currentPlayerId || 0];
-        const hand = currentPlayer.playArea.map(card => this.scoreCard(card));
-        
-        let score = hand.reduce((acc, card) => {
-            if (card) {
-                return acc + card;
-            }
-            return acc;
-        }, 0);
 
-        // Zero out rows of same score
-        for (let i = 0; i <= 2; i++) {
-            if (hand[i*3] && hand[i*3] > 0 && (hand[i*3] === hand[i*3+1] && hand[i*3] === hand[i*3+2])) {
-                score -= 3 * hand[i*3];
-            }
-        }
-
-        // Zero out columns of same score
-        for (let i = 0; i <= 2; i++) {
-            if (hand[i] && hand[i] > 0 && (hand[i] === hand[i+3] && hand[i] === hand[i+6])) {
-                score -= 3 * hand[i];
-            }
-        }
-
+        const score = calculateScore(currentPlayer);
         currentPlayer.score = score;
     }
 
