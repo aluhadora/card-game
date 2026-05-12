@@ -6,19 +6,19 @@ import http from 'http';
 import path from 'path';
 const __dirname = path.resolve();
 import { Server } from 'socket.io';
-import RoomState from './roomState.js';
+import RoomState from './roomState.ts';
 
 
 // app.use(cors());
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
-app.use(express.static(path.resolve(__dirname, './client/dist')));
+// app.use(express.static(path.resolve(__dirname, './client/dist')));
 
 const PORT = process.env.PORT || 3001;
 
 const server = http.createServer(app);
 const io = new Server(server, {
-    cors: { origin: ["http://localhost:5173", "http://192.168.50.200:5173"], methods: ["GET", "POST"] },
+    cors: { origin: ["http://localhost:5173", "http://192.168.50.200:5173", "http://localhost:80", "http://client:80", "http://localhost"], methods: ["GET", "POST"] },
 });
 
 app.use((req, res, next) => {
@@ -39,7 +39,7 @@ io.on('connection', socket => {
         socket.on('player-joined', (data) => {
             let room = rooms[data.pin];
             if (!room) {
-                rooms[data.pin] = new RoomState.default();
+                rooms[data.pin] = new RoomState();
                 room = rooms[data.pin];
                 room.joinHost({ roomId: data.pin, playerId: data.playerId, nickname: data.nickname, socketId: socket.id, playerSecret: data.playerSecret });
                 console.log(`Host created room ${data.pin} with ID ${socket.id}`);
@@ -116,9 +116,9 @@ app.get('/api/rooms/:pin', (req, res) => {
 });
 
 // All other GET requests not handled before will return our React app
-app.get('*', (_, res) => {
-    res.sendFile(path.resolve(__dirname, './client/dist', 'index.html'));
-});
+// app.get('*', (_, res) => {
+//     res.sendFile(path.resolve(__dirname, './client/dist', 'index.html'));
+// });
 
 server.listen(PORT, "0.0.0.0", () => {
     console.log(`Server listening on ${PORT}`);
