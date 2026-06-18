@@ -20,8 +20,8 @@ services:
       args:
         VITE_SERVER_URL: /api
     container_name: card-game-client
-    expose:
-      - "80"
+    ports:
+      - "8080:80"
     depends_on:
       - server
     restart: unless-stopped

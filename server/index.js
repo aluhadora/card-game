@@ -115,6 +115,14 @@ app.get('/api/rooms/:pin', (req, res) => {
     }
 });
 
+app.get('/api/test', (req, res) => {
+    res.status(200).json({ message: "Test successful" });
+});
+
+app.get('/test', (req, res) => {
+    res.status(200).json({ message: "Test (short url) successful" });
+});
+
 // All other GET requests not handled before will return our React app
 // app.get('*', (_, res) => {
 //     res.sendFile(path.resolve(__dirname, './client/dist', 'index.html'));
