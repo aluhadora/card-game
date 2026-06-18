@@ -18,7 +18,7 @@ const PORT = process.env.PORT || 3001;
 
 const server = http.createServer(app);
 const io = new Server(server, {
-    cors: { origin: ["http://localhost:5173", "http://192.168.50.200:5173", "http://localhost:80", "http://client:80", "http://localhost"], methods: ["GET", "POST"] },
+    cors: { origin: ["http://localhost:5173", "http://192.168.50.200:5173", "http://localhost:80", "http://client:80", "http://localhost", "http://localhost:3000"], methods: ["GET", "POST"] },
 });
 
 app.use((req, res, next) => {
@@ -98,7 +98,7 @@ io.on('connection', socket => {
 
 });
 
-app.get('/api/rooms/:pin', (req, res) => {
+app.get('/rooms/:pin', (req, res) => {
     const pin = req.params.pin;
     if (rooms[pin]) {
         res.status(200).json({

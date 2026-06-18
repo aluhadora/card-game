@@ -17,8 +17,6 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
-      args:
-        VITE_SERVER_URL: /api
     container_name: card-game-client
     expose:
       - "80"
