@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  client:
+    ports:
+      - "3000:80"
+  server:
+    ports:
+      - "3001:3001"
