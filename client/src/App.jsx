@@ -75,7 +75,7 @@ export default function App() {
         newParams.set('pin', gameId);
         updateQuery(newParams);
 
-        const serverUrl = import.meta.env.VITE_SERVER_URL || "/";
+        const serverUrl = import.meta.env.VITE_SERVER_URL || "/api";
         console.log("server url", serverUrl);
         console.log("Joining game with ID:", gameId);
 
@@ -83,7 +83,9 @@ export default function App() {
         localStorage.setItem("playerSecret", playerSecret);
         localStorage.setItem("nickname", nickname);
 
-        const socket = io(serverUrl);
+        const socket = io(serverUrl, {
+          path: serverUrl === "/api" ? "/api/socket.io" : "/socket.io"
+        });
         socket.on("connect", () => setPlayerId(playerId));
 
         socket.emit("player-joined", { pin: gameId, playerId: playerId, playerSecret: playerSecret, nickname: nickname });
