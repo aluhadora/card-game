@@ -32,9 +32,9 @@ app.use((req, res, next) => {
 // app.use(express.static(path.resolve(__dirname, '../client/build')));
 
 var rooms = {};
-
+console.log("initializing socker")
 io.on('connection', socket => {
-
+    console.log("Client connected:", socket.id);
     try {
         socket.on('player-joined', (data) => {
             let room = rooms[data.pin];
