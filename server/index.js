@@ -98,7 +98,7 @@ io.on('connection', socket => {
 
 });
 
-app.get('/rooms/:pin', (req, res) => {
+app.get('/api/rooms/:pin', (req, res) => {
     const pin = req.params.pin;
     if (rooms[pin]) {
         res.status(200).json({

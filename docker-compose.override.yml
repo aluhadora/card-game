@@ -1,7 +1,8 @@
 services:
   client:
     build:
-      dockerfile: DockerfileDev
+      context: ./client
+      dockerfile: Dockerfile
       target: dev
     volumes:
       - ./client:/app
@@ -15,7 +16,7 @@ services:
     depends_on:
       - server
     restart: unless-stopped
-  
+
   server:
     volumes:
       - ./server:/app
