@@ -75,7 +75,7 @@ export default function App() {
         newParams.set('pin', gameId);
         updateQuery(newParams);
 
-        const serverUrl = import.meta.env.VITE_SERVER_URL || "/";
+        const serverUrl = import.meta.env.VITE_SERVER_URL;
         console.log("server url", serverUrl);
         console.log("Joining game with ID:", gameId);
 
@@ -83,7 +83,11 @@ export default function App() {
         localStorage.setItem("playerSecret", playerSecret);
         localStorage.setItem("nickname", nickname);
 
-        const socket = io(serverUrl);
+        // Use direct URL for local dev (e.g. http://localhost:3001), otherwise proxy through nginx
+        console.log("serverUrl", serverUrl);
+        const socket = (serverUrl && serverUrl.startsWith('http'))
+          ? io(serverUrl)
+          : io({ path: "/socket.io" });
         socket.on("connect", () => setPlayerId(playerId));
 
         socket.emit("player-joined", { pin: gameId, playerId: playerId, playerSecret: playerSecret, nickname: nickname });
