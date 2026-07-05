@@ -84,9 +84,10 @@ export default function App() {
         localStorage.setItem("nickname", nickname);
 
         // Use direct URL for local dev (e.g. http://localhost:3001), otherwise proxy through nginx
+        console.log("serverUrl", serverUrl);
         const socket = (serverUrl && serverUrl.startsWith('http'))
           ? io(serverUrl)
-          : io({ path: "/api/socket.io" });
+          : io({ path: "/socket.io" });
         socket.on("connect", () => setPlayerId(playerId));
 
         socket.emit("player-joined", { pin: gameId, playerId: playerId, playerSecret: playerSecret, nickname: nickname });

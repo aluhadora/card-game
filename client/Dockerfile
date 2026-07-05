@@ -1,15 +1,11 @@
-# Use Node.js to build the app
-FROM node:18-alpine AS deps
+FROM node:25-alpine3.22 AS base
 
 WORKDIR /app
 
-# Copy package.json and install dependencies
 COPY package.json package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm npm ci --no-audit --no-fund --prefer-offline --progress=false
 
-FROM node:25-alpine3.22 AS dev
-
-WORKDIR /app
+FROM base AS dev
 
 COPY . .
 COPY docker/dev-entrypoint.sh /usr/local/bin/dev-entrypoint.sh
@@ -19,16 +15,13 @@ EXPOSE 5173
 
 CMD ["/usr/local/bin/dev-entrypoint.sh"]
 
-FROM node:25-alpine3.22 AS build
+FROM base AS build
 
-WORKDIR /app
-
-COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
 
-# serve app from nginx
-FROM nginx:alpine
+FROM nginx:alpine AS prod
+
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 

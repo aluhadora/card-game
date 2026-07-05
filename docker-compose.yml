@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   server:
     build:
@@ -17,6 +15,7 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
+      target: prod
     container_name: card-game-client
     expose:
       - "80"
