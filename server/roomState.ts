@@ -1,6 +1,6 @@
 import GarbageGame from "./garbage/garbageGame.js";
 import GolfGame from "./golf/golfGameState.js";
-import { Participant, Game, StartGamePayload, RoomJoinPayload } from "./types.js";
+import { Participant, Game, StartGamePayload, RoomJoinPayload, BaseSocketPayload, BasePlayerMovePayload } from "./types.js";
 
 export default class RoomState {
     hostId: string;
@@ -17,16 +17,16 @@ export default class RoomState {
         this.players = [];
         this.gameState = new GolfGame();
     }
-    
-    joinHost(data : { hostId: string, pin: string}) {
+
+    joinHost(data: { hostId: string, pin: string }) {
         this.hostId = data.hostId;
         this.roomId = data.pin;
-        this.players = []; 
+        this.players = [];
         this.roomstate = "Lobby";
         this.gameState = new GolfGame();
     }
 
-    joinNewPlayer(data : RoomJoinPayload) {
+    joinNewPlayer(data: RoomJoinPayload) {
         this.players.push({
             playerId: data.playerId,
             nickname: data.nickname,
@@ -35,7 +35,7 @@ export default class RoomState {
         });
     }
 
-    joinPlayer(data : RoomJoinPayload) {
+    joinPlayer(data: RoomJoinPayload) {
         if (!data.roomId) {
             console.error("No room exists to join.");
             return;
@@ -62,7 +62,7 @@ export default class RoomState {
         this.gameState.addPlayer(data);
     }
 
-    startGame(data : StartGamePayload) {
+    startGame(data: StartGamePayload) {
         if (this.roomstate !== "Lobby") {
             console.error("Cannot start game, room is not in Lobby state.");
             return;
@@ -92,7 +92,7 @@ export default class RoomState {
         return this.gameState.startGame(data);
     }
 
-    playerMove(data : any) {
+    playerMove(data: BasePlayerMovePayload) {
         if (this.roomstate !== "Running") {
             console.error("Cannot make a move, game is not running.");
             return;
@@ -101,7 +101,7 @@ export default class RoomState {
             console.error(`Player ${data.playerId} is not in the room.`);
             return;
         }
-    
+
         return this.gameState.playerMove(data);
     }
 }

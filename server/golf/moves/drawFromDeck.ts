@@ -1,12 +1,12 @@
 import { GameStates } from "../constants";
 import { MoveContext, MoveData } from "../types";
 
-export default function drawFromDeck({player} : MoveData, { actions} : MoveContext) {
+export default function drawFromDeck({ player }: MoveData, { actions }: MoveContext) {
     if (player.selectedCard) {
         console.warn("Player already has a selected card. Cannot draw another one.");
         return;
     }
-    
+
     const drawnCard = actions.draw();
     if (!drawnCard) {
         console.error("No card to draw from deck!");
@@ -16,10 +16,11 @@ export default function drawFromDeck({player} : MoveData, { actions} : MoveConte
     player.selectedCard = drawnCard;
     actions.gameState(GameStates.SecondCard);
 
-    return { 
-        delta: { 
-            from: "deck-card", 
-            to: `p${player.id}-selected`, 
-            card: drawnCard 
-        }};
+    return {
+        delta: {
+            from: "deck-card",
+            to: `p${player.id}-selected`,
+            card: drawnCard
+        }
+    };
 }

@@ -1,7 +1,7 @@
 import { GameStates } from "../constants";
 import { MoveContext, MoveData } from "../types";
 
-export default function declineSelected({ player } : MoveData, { actions, gameState, discards } : MoveContext) {
+export default function declineSelected({ player }: MoveData, { actions, gameState, discards }: MoveContext) {
     if (!player.selectedCard) {
         console.error("No selected card to decline!");
         return;
@@ -15,9 +15,11 @@ export default function declineSelected({ player } : MoveData, { actions, gameSt
         actions.advancePlayer();
     }
 
-    return { 
-        delta: { 
-            from: `p${player.id}-selected`, 
-            to: `discard-pile`, 
-            card: discards.slice(-1)[0] }};
+    return {
+        delta: {
+            from: `p${player.id}-selected`,
+            to: `discard-pile`,
+            card: discards.slice(-1)[0]
+        }
+    };
 }

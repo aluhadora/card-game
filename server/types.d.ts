@@ -8,7 +8,7 @@ export type Participant = {
 export interface Game {
     players: Record<string, unknown>;
     visibleState(extraData?: Record<string, unknown>): Record<string, unknown>;
-    playerMove(data: unknown): Record<string, unknown> | undefined;
+    playerMove(data: BasePlayerMovePayload): Record<string, unknown> | undefined;
     startGame(data: StartGamePayload): Record<string, unknown>;
     addPlayer(data: AddPlayerPayload): void;
 }
@@ -36,4 +36,8 @@ export interface AddPlayerPayload extends BaseSocketPayload {
   nickname: string;
   socketId: string;
   roomId: string;
+}
+
+export interface BasePlayerMovePayload extends BaseSocketPayload {
+  playerId: string;
 }

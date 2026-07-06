@@ -1,6 +1,6 @@
 import { MoveContext, MoveData } from "../types";
 
-export default function acceptSelected({cardIndex, player} : MoveData, { discards, actions } : MoveContext) {
+export default function acceptSelected({ cardIndex, player }: MoveData, { discards, actions }: MoveContext) {
     if (!player.selectedCard) {
         console.error("No selected card to accept!");
         return;
@@ -10,19 +10,21 @@ export default function acceptSelected({cardIndex, player} : MoveData, { discard
     player.playArea[cardIndex] = player.selectedCard; // Place the accepted card in the player's play area
 
     discards.push(currentCardInSlot || actions.draw()); // Add the new card to the discard pile
-    
+
     player.selectedCard = null; // Clear the selected card
-    
+
     actions.recalculateScore(null);
     actions.advancePlayer();
 
-    return { deltas: [{ 
-        from: `p${player.id}-selected`, 
-        to: `p${player.id}-${cardIndex}`, 
-        card: player.playArea[cardIndex] 
-    }, {
-        from: `p${player.id}-${cardIndex}`, 
-        to: `discard-pile`, 
-        card: discards.slice(-1)[0] 
-    }]};
+    return {
+        deltas: [{
+            from: `p${player.id}-selected`,
+            to: `p${player.id}-${cardIndex}`,
+            card: player.playArea[cardIndex]
+        }, {
+            from: `p${player.id}-${cardIndex}`,
+            to: `discard-pile`,
+            card: discards.slice(-1)[0]
+        }]
+    };
 }

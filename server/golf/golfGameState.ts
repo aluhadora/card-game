@@ -5,7 +5,7 @@ import calculateScore from "./scoreService.ts";
 import { Card, Player, MoveData, MoveContext, MoveContextActions, StartGolfGamePayload } from "./types";
 
 class Deck {
-    shuffledDeck : Card[];
+    shuffledDeck: Card[];
 
     constructor(numberOfDecks = 1) {
         const cardNames = ["spade_1", "spade_2", "spade_3", "spade_4", "spade_5", "spade_6", "spade_7", "spade_8", "spade_9", "spade_10", "spade_jack", "spade_queen", "spade_king",
@@ -15,11 +15,13 @@ class Deck {
             "joker_black", "joker_red"
         ];
 
-        const decks : Card[] = [];
+        const decks: Card[] = [];
         for (let i = 0; i < numberOfDecks; i++) {
-            decks.push(...cardNames.map(name => ({ name, 
-                score: this.scoreCard(name), 
-                rank: name.split("_")[1]})));
+            decks.push(...cardNames.map(name => ({
+                name,
+                score: this.scoreCard(name),
+                rank: name.split("_")[1]
+            })));
         }
 
         // shuffle the deck
@@ -27,7 +29,7 @@ class Deck {
         this.draw = this.draw.bind(this);
     }
 
-    scoreCard(cardName : string) : number {
+    scoreCard(cardName: string): number {
         if (cardName.startsWith("joker")) return -2;
 
         const value = cardName.split("_")[1];
@@ -42,7 +44,7 @@ class Deck {
         }
     }
 
-    draw() : Card {
+    draw(): Card {
         const card = this.shuffledDeck.pop();
 
         if (!card) {
@@ -53,19 +55,19 @@ class Deck {
         return card;
     }
 
-    length () {
+    length() {
         return this.shuffledDeck.length;
     }
-    
+
 }
 
 export default class GolfGame implements Game {
     players: Record<string, Player>;
     gameState: string;
-    currentPlayerId : string | null;
+    currentPlayerId: string | null;
     discards: Card[];
     deck: Deck;
-    moveHandler : MoveHandler;
+    moveHandler: MoveHandler;
 
     constructor() {
         this.players = {};
@@ -76,7 +78,7 @@ export default class GolfGame implements Game {
         this.moveHandler = new MoveHandler();
     }
 
-    allPlayers() : Player[] {
+    allPlayers(): Player[] {
         return Object.values(this.players);
     }
 
@@ -94,7 +96,7 @@ export default class GolfGame implements Game {
         };
     }
 
-    addPlayer(playerData : AddPlayerPayload) {
+    addPlayer(playerData: AddPlayerPayload) {
         const playerId = playerData.playerId;// || playerData.id;
         const playerName = playerData.nickname;// || playerData.name;
 
@@ -112,15 +114,15 @@ export default class GolfGame implements Game {
         }
     }
 
-    startGame(settings : StartGolfGamePayload) {
+    startGame(settings: StartGolfGamePayload) {
         const allPlayers = this.allPlayers();
         this.gameState = GameStates.Opening;
         this.deck = new Deck(settings?.decks || 1); // Reset the deck for a new game
         let index = 0;
-        allPlayers.forEach((player : Player) => {
+        allPlayers.forEach((player: Player) => {
             player.index = index++;
         });
-        this.currentPlayerId = allPlayers.find((player : Player) => player.index === 0)?.id || null;
+        this.currentPlayerId = allPlayers.find((player: Player) => player.index === 0)?.id || null;
 
         const firstCard = this.deck.draw();
 
@@ -129,26 +131,26 @@ export default class GolfGame implements Game {
         return this.visibleState();
     }
 
-    scoreCard(card : Card | null) : number {
+    scoreCard(card: Card | null): number {
         return card?.score || 0;
     }
 
-    recalculateScore(player : Player | null) {
+    recalculateScore(player: Player | null) {
         const currentPlayer = player || this.players[this.currentPlayerId || 0];
 
         const score = calculateScore(currentPlayer);
         currentPlayer.score = score;
     }
 
-    totalUnrevealedCards() : number {
-        return this.allPlayers().reduce((acc : number, player : Player) => {
+    totalUnrevealedCards(): number {
+        return this.allPlayers().reduce((acc: number, player: Player) => {
             return acc + player.playArea.filter(card => card === null).length;
         }, 0);
     }
 
     advancePlayer() {
         const allPlayers = this.allPlayers();
-        const currentPlayer = allPlayers.find((player : Player) => player.id === this.currentPlayerId) || null;
+        const currentPlayer = allPlayers.find((player: Player) => player.id === this.currentPlayerId) || null;
 
         if (!currentPlayer) {
             console.warn("No current player found. Cannot advance player.");
@@ -179,7 +181,7 @@ export default class GolfGame implements Game {
         }
     }
 
-    advanceGameState(state : string) {
+    advanceGameState(state: string) {
         console.log("Moving to state", state);
         if (this.gameState === GameStates.Opening) {
             if (this.allPlayers().every(player => player.playArea.filter(card => card !== null).length >= 2)) {
@@ -192,15 +194,15 @@ export default class GolfGame implements Game {
         return this.visibleState();
     }
 
-    playerMove(moveData : MoveData) : any | undefined {
-        const actions : MoveContextActions = {
+    playerMove(moveData: MoveData): any | undefined {
+        const actions: MoveContextActions = {
             draw: this.deck.draw,
             recalculateScore: this.recalculateScore.bind(this),
             advancePlayer: this.advancePlayer.bind(this),
             gameState: this.advanceGameState.bind(this),
         };
 
-        const context : MoveContext = {
+        const context: MoveContext = {
             gameState: this.gameState,
             players: this.players,
             currentPlayerId: this.currentPlayerId || "",
@@ -208,7 +210,7 @@ export default class GolfGame implements Game {
             actions: actions
         }
 
-        const delta = this.moveHandler.handleMove({...moveData, player: this.players[moveData.playerId]}, context);
+        const delta = this.moveHandler.handleMove({ ...moveData, player: this.players[moveData.playerId] }, context);
 
         return this.visibleState(delta);
     }

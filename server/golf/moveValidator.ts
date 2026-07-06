@@ -3,7 +3,7 @@ import { MoveContext, MoveData } from "./types";
 
 export default class MoveValidator {
 
-    validateOpeningStatePlayerMove({ player, cardIndex, playerId }: MoveData, { gameState }: MoveContext) : boolean {
+    validateOpeningStatePlayerMove({ player, cardIndex, playerId }: MoveData, { gameState }: MoveContext): boolean {
         if (gameState !== GameStates.Opening) return true;
 
         if (!player) return false;
@@ -23,7 +23,7 @@ export default class MoveValidator {
         return true;
     }
 
-    validatePlayerTurn({ playerId }: MoveData, { gameState, currentPlayerId }: MoveContext) : boolean {
+    validatePlayerTurn({ playerId }: MoveData, { gameState, currentPlayerId }: MoveContext): boolean {
         if (gameState === GameStates.Opening) return true;
 
         if (currentPlayerId !== playerId) {
@@ -33,7 +33,7 @@ export default class MoveValidator {
         return true;
     }
 
-    validateMove(moveData : MoveData, context : MoveContext) : boolean {
+    validateMove(moveData: MoveData, context: MoveContext): boolean {
         return this.validateOpeningStatePlayerMove(moveData, context)
             && this.validatePlayerTurn(moveData, context);
     }

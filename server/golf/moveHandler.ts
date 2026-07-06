@@ -24,9 +24,9 @@ export default class MoveHandler {
         this.moveDictionary[MoveTypes.DeclineSelected] = declineSelected;
     }
 
-    handleMove(moveData : MoveData, context : MoveContext) : {} | undefined {
+    handleMove(moveData: MoveData, context: MoveContext): {} | undefined {
         if (!this.moveValidator.validateMove(moveData, context)) return;
-        
+
         if (context.gameState === GameStates.Opening) {
             return this.moveDictionary[MoveTypes.OpeningMove](moveData, context);
         }

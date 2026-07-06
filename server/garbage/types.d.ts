@@ -1,4 +1,4 @@
-import { StartGamePayload } from "../types";
+import { BasePlayerMovePayload, StartGamePayload } from "../types";
 
 export type Player = {
     id: string;
@@ -15,9 +15,8 @@ export type Card = {
     name: string;
 }
 
-export type MoveData = {
+export type MoveData = BasePlayerMovePayload & {
     moveType: string;
-    playerId: string;
     cardIndex: number;
     player: Player;
 }
