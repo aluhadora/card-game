@@ -6,8 +6,11 @@ import { animationTime } from './logic/animationConfiguration';
 import MessagesPanel from './components/messagesPanel';
 import GameBoard from './components/gameBoard';
 import AnimationHandler from './games/common/components/animationHandler';
+import useDeckPreloader from './hooks/useDeckPreloader';
 
 export default function App() {
+
+    useDeckPreloader();
 
     const params = new URLSearchParams(window.location.search);
     const searchTerm = params.get('pin');

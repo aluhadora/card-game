@@ -1,12 +1,20 @@
 import useImagePreloader from "./useImagePreloader";
 
 function allImages() {
-    const images = import.meta.glob("/public/images/cards/*.png", { eager: true });
-    // const images = [];
-    const imageUrls = Object.keys(images).map(path => path.replace("/public", ""))
-    console.log("Preloading images:", imageUrls);
+    const suits = ['club', 'diamond', 'heart', 'spade'];
+    const ranks = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'jack', 'queen', 'king'];
 
-    return imageUrls;
+    const cardImages = suits.flatMap(suit =>
+        ranks.map(rank => `/images/cards/${suit}_${rank}.png`)
+    );
+
+    const miscImages = [
+        '/images/cards/joker_black.png',
+        '/images/cards/joker_red.png',
+        '/images/cards/back.png',
+    ];
+
+    return [...cardImages, ...miscImages];
 }
 
 export default function useDeckPreloader() {
