@@ -1,4 +1,4 @@
-import { Game } from "../types";
+import { Game, StartGamePayload } from "../types";
 import { GameStates } from "./constants.ts";
 import MoveHandler from "./moveHandler.ts";
 import { Card, Player, MoveData, MoveContext, MoveContextActions } from "./types";
@@ -103,7 +103,7 @@ export default class GarbageGame implements Game {
         }
     }
 
-    startGame(settings : {decks: number}) {
+    startGame(settings : StartGamePayload & { decks: number}) {
         const allPlayers = this.allPlayers();
         this.gameState = GameStates.Opening;
         this.deck = new Deck(settings?.decks || 1); // Reset the deck for a new game

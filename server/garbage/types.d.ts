@@ -1,3 +1,5 @@
+import { StartGamePayload } from "../types";
+
 export type Player = {
     id: string;
     selectedCard: Card | null;
@@ -31,4 +33,14 @@ export type MoveContext = {
 export type MoveContextActions = { 
     advancePlayer: () => void;
     draw: () => Card;
+}
+
+export interface StartGarbageGamePayload extends StartGamePayload {
+    players: Array<{
+        playerId: string;
+        nickname: string;
+        playerSecret: string;
+    }>;
+    gameType: 'garbage';
+    rounds?: number;
 }

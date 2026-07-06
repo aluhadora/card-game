@@ -1,3 +1,5 @@
+import { StartGamePayload } from "../types";
+
 export type Player = {
     id: string;
     selectedCard: Card | null;
@@ -31,6 +33,16 @@ export type MoveContext = {
 export type MoveContextActions = { 
     gameState: (state: string) => void;
     advancePlayer: () => void;
-    recalculateScore: (player?: Player) => void;
+    recalculateScore: (player: Player | null) => void;
     draw: () => Card;
+}
+
+export interface StartGolfGamePayload extends StartGamePayload {
+    players: Array<{
+        playerId: string;
+        nickname: string;
+        playerSecret: string;
+    }>;
+    gameType: 'golf';
+    decks: number;
 }

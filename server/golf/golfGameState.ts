@@ -1,8 +1,8 @@
-import { Game } from "../types";
+import { AddPlayerPayload, Game } from "../types";
 import { GameStates } from "./constants.ts";
 import MoveHandler from "./moveHandler.ts";
 import calculateScore from "./scoreService.ts";
-import { Card, Player, MoveData, MoveContext, MoveContextActions } from "./types";
+import { Card, Player, MoveData, MoveContext, MoveContextActions, StartGolfGamePayload } from "./types";
 
 class Deck {
     shuffledDeck : Card[];
@@ -94,9 +94,9 @@ export default class GolfGame implements Game {
         };
     }
 
-    addPlayer(playerData : any) {
-        const playerId = playerData.playerId || playerData.id;
-        const playerName = playerData.nickname || playerData.name;
+    addPlayer(playerData : AddPlayerPayload) {
+        const playerId = playerData.playerId;// || playerData.id;
+        const playerName = playerData.nickname;// || playerData.name;
 
         if (!this.players[playerId]) {
             this.players[playerId] = {
@@ -112,15 +112,15 @@ export default class GolfGame implements Game {
         }
     }
 
-    startGame(settings : {decks: number}) {
+    startGame(settings : StartGolfGamePayload) {
         const allPlayers = this.allPlayers();
         this.gameState = GameStates.Opening;
         this.deck = new Deck(settings?.decks || 1); // Reset the deck for a new game
         let index = 0;
-        allPlayers.forEach((player : any) => {
+        allPlayers.forEach((player : Player) => {
             player.index = index++;
         });
-        this.currentPlayerId = allPlayers.find((player : any) => player.index === 0)?.id || null;
+        this.currentPlayerId = allPlayers.find((player : Player) => player.index === 0)?.id || null;
 
         const firstCard = this.deck.draw();
 

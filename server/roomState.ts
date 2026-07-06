@@ -1,6 +1,6 @@
 import GarbageGame from "./garbage/garbageGame.js";
 import GolfGame from "./golf/golfGameState.js";
-import { Participant, Game } from "./types.js";
+import { Participant, Game, StartGamePayload, RoomJoinPayload } from "./types.js";
 
 export default class RoomState {
     hostId: string;
@@ -8,7 +8,15 @@ export default class RoomState {
     roomId: string;
     players: Participant[];
     gameState: Game;
-    gameType: string;
+    gameType: string = "";
+
+    constructor() {
+        this.hostId = "";
+        this.roomstate = "Lobby";
+        this.roomId = "";
+        this.players = [];
+        this.gameState = new GolfGame();
+    }
     
     joinHost(data : { hostId: string, pin: string}) {
         this.hostId = data.hostId;
@@ -18,7 +26,7 @@ export default class RoomState {
         this.gameState = new GolfGame();
     }
 
-    joinNewPlayer(data : { playerId: string, nickname: string, socketId: string, playerSecret: string }) {
+    joinNewPlayer(data : RoomJoinPayload) {
         this.players.push({
             playerId: data.playerId,
             nickname: data.nickname,
@@ -27,7 +35,7 @@ export default class RoomState {
         });
     }
 
-    joinPlayer(data : { playerId: string, nickname: string, socketId: string, playerSecret: string, roomId: string }) {
+    joinPlayer(data : RoomJoinPayload) {
         if (!data.roomId) {
             console.error("No room exists to join.");
             return;
@@ -54,7 +62,7 @@ export default class RoomState {
         this.gameState.addPlayer(data);
     }
 
-    startGame(data : any) {
+    startGame(data : StartGamePayload) {
         if (this.roomstate !== "Lobby") {
             console.error("Cannot start game, room is not in Lobby state.");
             return;
@@ -72,6 +80,7 @@ export default class RoomState {
 
         this.players.forEach(player => {
             this.gameState.addPlayer({
+                pin: this.roomId,
                 playerId: player.playerId,
                 nickname: player.nickname,
                 socketId: player.socketIds[0],

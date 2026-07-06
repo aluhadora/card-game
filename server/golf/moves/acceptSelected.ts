@@ -13,7 +13,7 @@ export default function acceptSelected({cardIndex, player} : MoveData, { discard
     
     player.selectedCard = null; // Clear the selected card
     
-    actions.recalculateScore();
+    actions.recalculateScore(null);
     actions.advancePlayer();
 
     return { deltas: [{ 

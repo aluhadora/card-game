@@ -11,7 +11,7 @@ export default function declineSelected({ player } : MoveData, { actions, gameSt
     player.selectedCard = null;
 
     if (gameState !== GameStates.FirstCard) {
-        actions.recalculateScore();
+        actions.recalculateScore(null);
         actions.advancePlayer();
     }
 
