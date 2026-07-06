@@ -7,6 +7,15 @@ export interface ChatMessagePayload extends BaseSocketPayload {
     gameType?: string;
 }
 
+export interface CancelGamePayload extends BaseSocketPayload {
+    playerId?: string;
+}
+
+export interface VoteCancelPayload extends BaseSocketPayload {
+    playerId?: string;
+    vote: boolean;
+}
+
 export interface RoomJoinedEvent {
     name: string;
     playerId: string;

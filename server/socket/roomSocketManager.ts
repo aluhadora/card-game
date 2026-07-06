@@ -2,16 +2,20 @@ import { Server, Socket } from 'socket.io';
 import RoomState from '../roomState.ts';
 import type {
     ChatMessagePayload,
+    CancelGamePayload,
+    VoteCancelPayload,
 } from './types.ts';
-import type { StartGamePayload, RoomJoinPayload, BasePlayerMovePayload } from '../types.d.ts';
+import type { StartGamePayload, BasePlayerMovePayload, RoomJoinPayload } from '../types.d.ts';
 
 export default class RoomSocketManager {
     private io: Server;
     private readonly rooms: Record<string, RoomState>;
+    private votes: Record<string, { yes: Set<string>; no: Set<string>; timer?: NodeJS.Timeout; required: number; timeoutMs: number }>; 
 
     constructor(io?: Server) {
         this.io = io as Server;
         this.rooms = {};
+        this.votes = {};
     }
 
     public setIo(io: Server) {
@@ -30,6 +34,8 @@ export default class RoomSocketManager {
             socket.on('start-game', (data: StartGamePayload) => this.handleStartGame(socket, data));
             socket.on('send-chat-message', (data: ChatMessagePayload) => this.handleSendChatMessage(socket, data));
             socket.on('player-move', (data: BasePlayerMovePayload) => this.handlePlayerMove(socket, data));
+            socket.on('cancel-game', (data: CancelGamePayload) => this.handleCancelGame(socket, data));
+            socket.on('vote-cancel', (data: VoteCancelPayload) => this.handleVoteCancel(socket, data));
 
             socket.on('disconnect', () => {
                 console.log('Client disconnected:', socket.id);
@@ -72,6 +78,77 @@ export default class RoomSocketManager {
             playerId: data.playerId,
             players: Object.values(room.gameState.players),
         });
+    }
+
+    private getPlayerBySocket(room: RoomState, socketId: string) {
+        return room.players.find((p) => p.socketIds && p.socketIds.includes(socketId));
+    }
+
+    private handleCancelGame(socket: Socket, data: CancelGamePayload) {
+        const pin = data.pin;
+        const room = this.rooms[pin];
+        if (!room) return;
+
+        const totalPlayers = room.players.length || 0;
+        // If single player, immediately exit
+        if (totalPlayers <= 1) {
+            this.io.to(pin).emit('exiting', { pin });
+            setTimeout(() => delete this.rooms[pin], 1000);
+            return;
+        }
+
+        // If a vote is already in progress, ignore
+        if (this.votes[pin]) return;
+
+        const required = Math.floor(totalPlayers / 2) + 1; // More than half of the players must vote yes to cancel
+        const yes = new Set<string>();
+        const no = new Set<string>();
+
+        // mark initiator's vote as yes if we can map to player
+        const initiator = this.getPlayerBySocket(room, socket.id);
+        if (initiator) yes.add(initiator.playerId);
+
+        const timeoutMs = 2 * 60 * 1000; // 2 minutes
+
+        const timer = setTimeout(() => {
+            // vote failed, revert
+            delete this.votes[pin];
+            this.io.to(pin).emit('vote-failed', { pin });
+        }, timeoutMs);
+
+        this.votes[pin] = { yes, no, timer, required, timeoutMs };
+
+        this.io.to(pin).emit('vote-started', { pin, required, yesCount: yes.size, noCount: no.size, totalPlayers, timeoutMs });
+    }
+
+    private handleVoteCancel(socket: Socket, data: VoteCancelPayload) {
+        const pin = data.pin;
+        const voteState = this.votes[pin];
+        const room = this.rooms[pin];
+        if (!voteState || !room) return;
+
+        const player = this.getPlayerBySocket(room, socket.id);
+        if (!player) return;
+
+        // remove from both sets first
+        voteState.yes.delete(player.playerId);
+        voteState.no.delete(player.playerId);
+
+        if (data.vote) voteState.yes.add(player.playerId);
+        else voteState.no.add(player.playerId);
+
+        const yesCount = voteState.yes.size;
+        const noCount = voteState.no.size;
+
+        this.io.to(pin).emit('vote-update', { pin, yesCount, noCount, required: voteState.required, totalPlayers: room.players.length });
+
+        if (yesCount >= voteState.required) {
+            // cancel the room
+            if (voteState.timer) clearTimeout(voteState.timer);
+            delete this.votes[pin];
+            this.io.to(pin).emit('exiting', { pin });
+            setTimeout(() => delete this.rooms[pin], 1000);
+        }
     }
 
     private handleStartGame(socket: Socket, data: StartGamePayload) {

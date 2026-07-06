@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import VoteModal from './voteModal';
 
 type Message = PlayerJoinedMessage | PlayerMovedMessage | ChatMessage | GameStartedMessage;
 
@@ -82,7 +83,7 @@ function Message({ message }: { message: any }) {
     );
 }
 
-function Panel({ messages, sendMessage, showMessages }: { messages: Message[]; sendMessage: (message: string) => void; showMessages: boolean }) {
+function Panel({ messages, sendMessage, showMessages, onCancel }: { messages: Message[]; sendMessage: (message: string) => void; showMessages: boolean; onCancel: () => void }) {
     const [messageText, setMessageText] = useState<string>("");
 
     if (!showMessages) return null;
@@ -97,6 +98,10 @@ function Panel({ messages, sendMessage, showMessages }: { messages: Message[]; s
 
     return (
         <div className="messages-panel">
+            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px'}}>
+                <strong>Chat</strong>
+                <button onClick={onCancel}>Cancel Game</button>
+            </div>
             <div className="messages-list">
                 {messages.map((message, index) => (
                         <Message key={index} message={message} />
@@ -108,9 +113,10 @@ function Panel({ messages, sendMessage, showMessages }: { messages: Message[]; s
     );
 }
 
-export default function MessagesPanel({ messages, sendMessage }: { messages: any[]; sendMessage: (message: string) => void }) {
+export default function MessagesPanel({ messages, sendMessage, socket, gameId, playerId }: { messages: any[]; sendMessage: (message: string) => void; socket?: any; gameId?: string; playerId?: string }) {
     const [showMessages, setShowMessages] = useState<boolean>(false);
     const [viewedMessages, setViewedMessages] = useState<any[]>(messages);
+    const [modalVisible, setModalVisible] = useState<boolean>(false);
 
     useEffect(() => {
         if (showMessages) {
@@ -118,6 +124,12 @@ export default function MessagesPanel({ messages, sendMessage }: { messages: any
         }
         console.log(messages);
     }, [messages,viewedMessages,showMessages,setViewedMessages]);
+
+    const onCancel = () => {
+        if (!socket || !gameId) return;
+        socket.emit('cancel-game', { pin: gameId });
+    };
+
 
     const blah = "foo";
     
@@ -128,7 +140,8 @@ export default function MessagesPanel({ messages, sendMessage }: { messages: any
             <div className={`messages-button ${showMessages ? "open" : "closed"} ${messages.length === viewedMessages.length ?"read" : "unread"}`} onClick={() => setShowMessages(!showMessages)}>
                 ❯
             </div>
-            <Panel messages={messages} sendMessage={sendMessage} showMessages={showMessages} />
+            <Panel messages={messages} sendMessage={sendMessage} showMessages={showMessages} onCancel={onCancel} />
+            <VoteModal socket={socket} gameId={gameId} onDismiss={() => {}} />
         </>
     );
 }

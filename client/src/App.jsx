@@ -150,7 +150,7 @@ export default function App() {
             <ConnectionManager gameId={gameId} setGameId={setGameId} joinGame={joinGame} players={players} playerId={playerId} connected={connected} started={started} startGame={startGame} />
             <GameBoard playerMove={playerMove} players={players} state={deltas[0]} playerId={playerId} started={started} />
             <AnimationHandler animationDeltas={animationDeltas} setAnimationDeltas={setAnimationDeltas} />
-            <MessagesPanel messages={messages} sendMessage={sendMessage} />
+            <MessagesPanel messages={messages} sendMessage={sendMessage} socket={socket} gameId={gameId} playerId={playerId} />
         </div>
     )
 }

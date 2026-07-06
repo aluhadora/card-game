@@ -1,11 +1,37 @@
-import { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { QRCodeSVG } from 'qrcode.react';
 import * as uuid from "uuid";
-import React from "react";
 
-function InitialHeader({ gameId, setGameId, joinGame, nickname, setNickname }) {
-    const [playerId, setPlayerId] = useState(localStorage.getItem("playerId") || uuid.v4()); // Use uuid.v4() for generating a new player ID if not present
-    const [playerSecret, setPlayerSecret] = useState(localStorage.getItem("playerSecret") || uuid.v4()); // Use uuid.v4() for generating a new player secret if not present
+type PlayersMap = Record<string, { playerId?: string; nickname?: string; socketIds?: string[]; playerSecret?: string }>;
+
+type RoomJoinedEvent = {
+    name: string;
+    playerId: string;
+    players: PlayersMap;
+};
+
+type ConnectionManagerProps = {
+    gameId: string;
+    setGameId: (id: string) => void;
+    joinGame: (nickname: string, playerId: string, playerSecret: string) => void;
+    players: RoomJoinedEvent[];
+    playerId: string | null;
+    connected: boolean;
+    started: boolean;
+    startGame: (settings: { decks: number; gameType: string }) => void;
+};
+
+type InitialHeaderProps = {
+    gameId: string;
+    setGameId: (id: string) => void;
+    joinGame: (nickname: string, playerId: string, playerSecret: string) => void;
+    nickname: string;
+    setNickname: (n: string) => void;
+};
+
+function InitialHeader({ gameId, setGameId, joinGame, nickname, setNickname }: InitialHeaderProps) {
+    const [playerId, setPlayerId] = useState<string>(localStorage.getItem("playerId") || uuid.v4()); // Use uuid.v4() for generating a new player ID if not present
+    const [playerSecret, setPlayerSecret] = useState<string>(localStorage.getItem("playerSecret") || uuid.v4()); // Use uuid.v4() for generating a new player secret if not present
 
     return <div>
         <div>
@@ -38,13 +64,13 @@ function InitialHeader({ gameId, setGameId, joinGame, nickname, setNickname }) {
     </div>
 }
 
-function PlayerDisplay({ player }) {
+function PlayerDisplay({ player }: { player: { nickname?: string } }) {
     return <div>
         <h4>{player.nickname}</h4>
     </div>
 }
 
-function LobbyHeader({ gameId, players, startGame, nickname }) {
+function LobbyHeader({ gameId, players, startGame, nickname }: { gameId: string; players: PlayersMap; startGame: () => void; nickname: string }) {
     const url = `${window.location.origin}/?pin=${gameId}`
     if (!players || !Object.keys(players).length) return <div>Loading...</div>;
 
@@ -63,8 +89,8 @@ function LobbyHeader({ gameId, players, startGame, nickname }) {
     </div>
 }
 
-function PostConnectionHeader({ gameId, players, startGame, started, nickname }) {
-    const [gameSettings, setGameSettings] = useState({ decks: 1, gameType: "golf" });
+function PostConnectionHeader({ gameId, players, startGame, started, nickname }: { gameId: string; players: PlayersMap | undefined; startGame: (settings: { decks: number; gameType: string }) => void; started: boolean; nickname: string }) {
+    const [gameSettings, setGameSettings] = useState<{ decks: number; gameType: string }>({ decks: 1, gameType: "golf" });
 
     useEffect(() => {
         if (!players) return;
@@ -98,9 +124,10 @@ function PostConnectionHeader({ gameId, players, startGame, started, nickname })
     );
 }
 
-export default function ConnectionManager({ gameId, setGameId, joinGame, players, connected, started, startGame }) {
+export default function ConnectionManager({ gameId, setGameId, joinGame, players, playerId, connected, started, startGame }: ConnectionManagerProps) {
     const [nickname, setNickname] = useState(localStorage.getItem("nickname") || "");
 
     if (!connected) return <InitialHeader gameId={gameId} setGameId={setGameId} joinGame={joinGame} nickname={nickname} setNickname={setNickname} />;
-    return <PostConnectionHeader gameId={gameId} players={players.slice(-1)[0]?.players} startGame={startGame} started={started} nickname={nickname} />;
+    const latestPlayers = players && players.length ? players[players.length - 1].players : undefined;
+    return <PostConnectionHeader gameId={gameId} players={latestPlayers} startGame={startGame} started={started} nickname={nickname} />;
 }
