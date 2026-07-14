@@ -1,5 +1,6 @@
 import { AddPlayerPayload, Game } from "../types";
 import { GameStates } from "./constants.ts";
+import { GameTypes } from "../constants.ts";
 import MoveHandler from "./moveHandler.ts";
 import calculateScore from "./scoreService.ts";
 import { Card, Player, MoveData, MoveContext, MoveContextActions, StartGolfGamePayload } from "./types";
@@ -35,7 +36,7 @@ export default class GolfGame implements Game {
             remainingCards: this.deck.length() - this.totalUnrevealedCards(),
             deckLength: this.deck.length(),
             totalUnrevealedCards: this.totalUnrevealedCards(),
-            gameType: "golf",
+            gameType: GameTypes.Golf,
             ...extraData
         };
     }
