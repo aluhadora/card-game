@@ -1,5 +1,6 @@
 import { Game, StartGamePayload } from "../types";
 import { GameStates } from "./constants.ts";
+import { GameTypes } from "../constants.ts";
 import MoveHandler from "./moveHandler.ts";
 import { Card, Player, MoveData, MoveContext, MoveContextActions } from "./types";
 import Deck from "../deck/deck.ts";
@@ -34,7 +35,7 @@ export default class GarbageGame implements Game {
             remainingCards: this.deck.length() - this.totalUnrevealedCards(),
             deckLength: this.deck.length(),
             totalUnrevealedCards: this.totalUnrevealedCards(),
-            gameType: "garbage",
+            gameType: GameTypes.Garbage,
             ...extraData
         };
     }

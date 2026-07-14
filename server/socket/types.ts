@@ -1,10 +1,12 @@
+import { GameType } from "../constants";
+
 export interface BaseSocketPayload {
     pin: string;
 }
 
 export interface ChatMessagePayload extends BaseSocketPayload {
     message: string;
-    gameType?: string;
+    gameType?: GameType;
 }
 
 export interface CancelGamePayload extends BaseSocketPayload {

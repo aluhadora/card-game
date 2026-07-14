@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { QRCodeSVG } from 'qrcode.react';
 import * as uuid from "uuid";
+import { GameTypes } from "../constants";
 
 type PlayersMap = Record<string, { playerId?: string; nickname?: string; socketIds?: string[]; playerSecret?: string }>;
 
@@ -90,7 +91,7 @@ function LobbyHeader({ gameId, players, startGame, nickname }: { gameId: string;
 }
 
 function PostConnectionHeader({ gameId, players, startGame, started, nickname }: { gameId: string; players: PlayersMap | undefined; startGame: (settings: { decks: number; gameType: string }) => void; started: boolean; nickname: string }) {
-    const [gameSettings, setGameSettings] = useState<{ decks: number; gameType: string }>({ decks: 1, gameType: "golf" });
+    const [gameSettings, setGameSettings] = useState<{ decks: number; gameType: string }>({ decks: 1, gameType: GameTypes.Golf });
 
     useEffect(() => {
         if (!players) return;
@@ -107,8 +108,9 @@ function PostConnectionHeader({ gameId, players, startGame, started, nickname }:
                     <label>
                         Game Type:
                         <select value={gameSettings.gameType} onChange={e => setGameSettings({ ...gameSettings, gameType: e.target.value })}>
-                            <option value="golf">Golf</option>
-                            <option value="garbage">Garbage</option>
+                            {Object.values(GameTypes).map(type => (
+                                <option key={type} value={type}>{type}</option>
+                            ))}
                         </select>
                     </label>
                 </div>

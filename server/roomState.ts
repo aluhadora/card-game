@@ -1,5 +1,7 @@
+import { GameTypes } from "./constants.js";
 import GarbageGame from "./garbage/garbageGame.js";
 import GolfGame from "./golf/golfGameState.js";
+import SudokuGame from "./sudoku/sudokuGame.js";
 import { Participant, Game, StartGamePayload, RoomJoinPayload, BaseSocketPayload, BasePlayerMovePayload } from "./types.js";
 
 export default class RoomState {
@@ -70,12 +72,14 @@ export default class RoomState {
         this.roomstate = "Running";
 
         console.log("Starting Room:", this.roomId, "with data:", data);
-        this.gameType = data.gameType || "golf";
+        this.gameType = data.gameType || GameTypes.Golf;
 
-        if (data.gameType === "golf" || !data.gameType) {
+        if (data.gameType === GameTypes.Golf || !data.gameType) {
             this.gameState = new GolfGame();
-        } else if (data.gameType === "garbage") {
+        } else if (data.gameType === GameTypes.Garbage) {
             this.gameState = new GarbageGame();
+        } else if (data.gameType === GameTypes.Sudoku) {
+            this.gameState = new SudokuGame();
         }
 
         this.players.forEach(player => {
