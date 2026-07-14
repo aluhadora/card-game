@@ -1,3 +1,5 @@
+import { GameType } from "./constants";
+
 export type Participant = {
     playerId: string;
     nickname: string;
@@ -14,30 +16,35 @@ export interface Game {
 }
 
 export interface BaseSocketPayload {
-  pin: string;
+    pin: string;
 }
 
 export interface StartGamePayload extends BaseSocketPayload {
-  gameType?: string;
+    gameType?: GameType;
 }
 
 export interface RoomJoinPayload extends BaseSocketPayload {
-  playerId: string;
-  playerSecret: string;
-  nickname: string;
-  gameType?: string;
-  socketId: string;
-  roomId: string;
+    playerId: string;
+    playerSecret: string;
+    nickname: string;
+    gameType?: GameType;
+    socketId: string;
+    roomId: string;
 }
 
 export interface AddPlayerPayload extends BaseSocketPayload {
-  playerId: string;
-  playerSecret: string;
-  nickname: string;
-  socketId: string;
-  roomId: string;
+    playerId: string;
+    playerSecret: string;
+    nickname: string;
+    socketId: string;
+    roomId: string;
+}
+
+export interface Player {
+    playerId: string;
+    nickname: string;
 }
 
 export interface BasePlayerMovePayload extends BaseSocketPayload {
-  playerId: string;
+    playerId: string;
 }
