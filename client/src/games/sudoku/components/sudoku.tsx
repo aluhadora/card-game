@@ -35,6 +35,7 @@ const standardCellStyle = {
     cursor: "pointer",
     fontSize: "30px",
     position: "relative" as const,
+    color: "black",
 }
 
 function ValuedCell({ inputProps, cell, playerId, playerMove, cellAddress }: CellProps) {
@@ -223,7 +224,7 @@ function NumberRow({ inputProps, playerMove, playerId }: { inputProps: InputProp
     return (
         <div>
             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map(number => (
-                <button key={number} onClick={() => inputProps.inputHandler.handleNumberClick(inputProps, number, playerMove, playerId)} style={{ backgroundColor: inputProps.selectedNumber === number ? "lightblue" : "white" }}>
+                <button key={number} onClick={() => inputProps.inputHandler.handleNumberClick(inputProps, number, playerMove, playerId)} style={{ backgroundColor: inputProps.selectedNumber === number ? "lightblue" : "white", color: "black", margin: "2px", width: "30px", height: "30px" }}>
                     {number}
                 </button>
             ))}

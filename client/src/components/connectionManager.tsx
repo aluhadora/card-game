@@ -8,6 +8,7 @@ import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
+import { ThemeProvider } from "@emotion/react";
 
 type PlayersMap = Record<string, { playerId?: string; nickname?: string; socketIds?: string[]; playerSecret?: string }>;
 
@@ -87,7 +88,8 @@ function PostConnectionHeader({ gameId, players, startGame, started, nickname }:
     if (started || !players) return null;
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+        // <ThemeProvider theme={{ palette: { mode: "dark",  } }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", color: "automatic" }}>
             <LobbyHeader gameId={gameId} players={players} startGame={() => startGame(gameSettings)} nickname={nickname} />
             <div style={{ marginTop: 20, display: "flex", flexDirection: "column", alignItems: "center" }}>
                 <FormControlLabel control={
@@ -103,6 +105,7 @@ function PostConnectionHeader({ gameId, players, startGame, started, nickname }:
             </div>
 
         </div>
+        // </ThemeProvider>
     );
 }
 
