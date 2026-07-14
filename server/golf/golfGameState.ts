@@ -3,63 +3,7 @@ import { GameStates } from "./constants.ts";
 import MoveHandler from "./moveHandler.ts";
 import calculateScore from "./scoreService.ts";
 import { Card, Player, MoveData, MoveContext, MoveContextActions, StartGolfGamePayload } from "./types";
-
-class Deck {
-    shuffledDeck: Card[];
-
-    constructor(numberOfDecks = 1) {
-        const cardNames = ["spade_1", "spade_2", "spade_3", "spade_4", "spade_5", "spade_6", "spade_7", "spade_8", "spade_9", "spade_10", "spade_jack", "spade_queen", "spade_king",
-            "heart_1", "heart_2", "heart_3", "heart_4", "heart_5", "heart_6", "heart_7", "heart_8", "heart_9", "heart_10", "heart_jack", "heart_queen", "heart_king",
-            "club_1", "club_2", "club_3", "club_4", "club_5", "club_6", "club_7", "club_8", "club_9", "club_10", "club_jack", "club_queen", "club_king",
-            "diamond_1", "diamond_2", "diamond_3", "diamond_4", "diamond_5", "diamond_6", "diamond_7", "diamond_8", "diamond_9", "diamond_10", "diamond_jack", "diamond_queen", "diamond_king",
-            "joker_black", "joker_red"
-        ];
-
-        const decks: Card[] = [];
-        for (let i = 0; i < numberOfDecks; i++) {
-            decks.push(...cardNames.map(name => ({
-                name,
-                score: this.scoreCard(name),
-                rank: name.split("_")[1]
-            })));
-        }
-
-        // shuffle the deck
-        this.shuffledDeck = decks.sort(() => Math.random() - 0.5);
-        this.draw = this.draw.bind(this);
-    }
-
-    scoreCard(cardName: string): number {
-        if (cardName.startsWith("joker")) return -2;
-
-        const value = cardName.split("_")[1];
-        if (value === "jack") {
-            return 10;
-        } else if (value === "queen" || value === "joker") {
-            return -2;
-        } else if (value === "king") {
-            return 0;
-        } else {
-            return parseInt(value);
-        }
-    }
-
-    draw(): Card {
-        const card = this.shuffledDeck.pop();
-
-        if (!card) {
-            console.error("No cards left in the deck to draw from!");
-            return { name: "", score: 0, rank: "" }; // Return a default card or handle the case as needed
-        }
-
-        return card;
-    }
-
-    length() {
-        return this.shuffledDeck.length;
-    }
-
-}
+import Deck from "../deck/deck.ts";
 
 export default class GolfGame implements Game {
     players: Record<string, Player>;
@@ -74,7 +18,7 @@ export default class GolfGame implements Game {
         this.gameState = "";
         this.currentPlayerId = null;
         this.discards = [];
-        this.deck = new Deck(); // Initialize the deck
+        this.deck = new Deck(1, true); // Initialize the deck
         this.moveHandler = new MoveHandler();
     }
 
@@ -117,7 +61,7 @@ export default class GolfGame implements Game {
     startGame(settings: StartGolfGamePayload) {
         const allPlayers = this.allPlayers();
         this.gameState = GameStates.Opening;
-        this.deck = new Deck(settings?.decks || 1); // Reset the deck for a new game
+        this.deck = new Deck(settings?.decks || 1, true); // Reset the deck for a new game
         let index = 0;
         allPlayers.forEach((player: Player) => {
             player.index = index++;
@@ -132,7 +76,13 @@ export default class GolfGame implements Game {
     }
 
     scoreCard(card: Card | null): number {
-        return card?.score || 0;
+        if (!card) return 0;
+        if (card.name.startsWith("joker")) return -2;
+        const value = card.name.split("_")[1];
+        if (value === "jack") return 10;
+        if (value === "queen") return -2;
+        if (value === "king") return 0;
+        return parseInt(value);
     }
 
     recalculateScore(player: Player | null) {

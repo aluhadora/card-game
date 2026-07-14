@@ -125,7 +125,9 @@ export default function App() {
         } else if (state.deltas) {
             console.log("Handling multiple deltas:", state.deltas);
             setAnimationDeltas(deltas => [...deltas, ...state.deltas]);
-            setTimeout(() => setState(state), animationTime*state.deltas.length + 50); 
+            // Deltas within a batch now play in parallel, so timing is
+            // constant regardless of batch size.
+            setTimeout(() => setState(state), animationTime + 50); 
         } else {
             console.log("Skipping animation");
             setState(state); // Store the new state
