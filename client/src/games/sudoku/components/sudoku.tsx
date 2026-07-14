@@ -56,7 +56,7 @@ function HintedCell({ inputProps, cell, playerId, playerMove, cellAddress }: Cel
     };
     return (
         <CellBase inputProps={inputProps} cell={cell} playerId={playerId} playerMove={playerMove} cellAddress={cellAddress} cellStyle={cellStyle}>
-            {cell.hints.map((hint) => (<CellHint key={hint.value} value={hint.value} />))}
+            {cell.hints.map((hint) => (<CellHint key={hint.value} value={hint.value} inputProps={inputProps} cell={cell} cellAddress={cellAddress} />))}
         </CellBase>
     );
 }
@@ -74,7 +74,7 @@ function ReadonlyCell({ inputProps, cell, cellAddress }: { inputProps: InputProp
     );
 }
 
-function CellHint({ value }: { value: number }) {
+function CellHint({ value, inputProps, cell, cellAddress }: { value: number, inputProps: InputProps, cell: Cell, cellAddress: [number, number] }) {
     // position for hint will fill in the relevant position inside the cell
     // for example
     // 1 |   | 3
@@ -91,6 +91,7 @@ function CellHint({ value }: { value: number }) {
         position: "absolute" as const,
         top: `${row * 13}px`,
         left: `${col * 13}px`,
+        backgroundColor: determineCellHintBackgroundColor(inputProps, value),
     };
     return (
         <div style={hintStyle}>
@@ -113,6 +114,15 @@ function isCellNeighbor(cellAddressA: [number, number] | null, cellAddressB: [nu
     return Math.floor(cellAddressA[0] / 3) === Math.floor(cellAddressB[0] / 3) && Math.floor(cellAddressA[1] / 3) === Math.floor(cellAddressB[1] / 3);
 }
 
+function determineCellHintBackgroundColor(inputProps: InputProps, value: number) {
+    const cellValueSelected = inputProps.selectedNumber === value;
+
+    if (cellValueSelected) return "lightblue";
+
+    return "transparent";
+}
+
+
 function determineCellBackgroundColor(inputProps: InputProps, cell: Cell, cellAddress: [number, number]) {
     const cellSelected = isCellMatch(inputProps.selectedCell, cellAddress);
     const cellHovered = isCellMatch(inputProps.hoveredCell, cellAddress);
@@ -123,7 +133,6 @@ function determineCellBackgroundColor(inputProps: InputProps, cell: Cell, cellAd
     if (cell.value !== null && inputProps.selectedNumber === cell.value) return "lightblue";
     if (cellHovered) return "lightgrey";
     if (cellNeighborHovered || cellNeighborSelected) return "#dedfe4c0";
-
 
     return "white";
 }
@@ -258,7 +267,14 @@ export default function Sudoku({ gameState, playerId, playerMove }: SudokuProps)
     // Lightning: Player selects a number, then clicks a cell to fill it in
     // Standard Hint: Player selects a cell, then either types a number, or clicks it in the number row to add a hint
     // Lightning Hint: Player selects a number, then clicks a cell to add a hint
-    const [inputMode, setInputMode] = useState<InputMode>(InputMode.Standard);
+    const [inputMode, setInputMode] = useState<InputMode>(
+        (localStorage.getItem("sudoku_inputMode") as InputMode) ?? InputMode.Standard
+    );
+
+    const setAndPersistInputMode = (mode: InputMode) => {
+        localStorage.setItem("sudoku_inputMode", mode);
+        setInputMode(mode);
+    };
     const [selectedNumber, setSelectedNumber] = useState<number | null>(null);
     const [selectedCell, setSelectedCell] = useState<[number, number] | null>(null);
     const [hoveredCell, setHoveredCell] = useState<[number, number] | null>(null);
@@ -269,7 +285,7 @@ export default function Sudoku({ gameState, playerId, playerMove }: SudokuProps)
 
     const inputProps: InputProps = {
         inputMode,
-        setInputMode,
+        setInputMode: setAndPersistInputMode,
         selectedNumber,
         setSelectedNumber,
         selectedCell,
