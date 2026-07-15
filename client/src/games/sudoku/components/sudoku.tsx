@@ -125,25 +125,23 @@ function determineCellHintBackgroundColor(inputProps: InputProps, value: number)
 
 
 function determineCellBackgroundColor(inputProps: InputProps, cell: Cell, cellAddress: [number, number]) {
+    const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     const cellSelected = isCellMatch(inputProps.selectedCell, cellAddress);
     const cellHovered = isCellMatch(inputProps.hoveredCell, cellAddress);
     const cellNeighborHovered = isCellNeighbor(inputProps.hoveredCell, cellAddress);
     const cellNeighborSelected = isCellNeighbor(inputProps.selectedCell, cellAddress);
 
+
     if (cellSelected) return "lightblue";
     if (cell.value !== null && inputProps.selectedNumber === cell.value) return "lightblue";
-    if (cellHovered) return "lightgrey";
-    if (cellNeighborHovered || cellNeighborSelected) return "#dedfe4c0";
+    if (cellHovered) return isDarkMode ? "whitesmoke" : "lightgrey";
+    if (cellNeighborHovered || cellNeighborSelected) return isDarkMode ? "#dedfe4e0" : "#dedfe4c0";
 
     return "white";
 }
 
 function CellBase({ inputProps, cell, playerId, playerMove, cellAddress, cellStyle, children }: { inputProps: InputProps, cell: Cell, playerId: string, playerMove: (move: MoveData) => void, cellAddress: [number, number], cellStyle?: React.CSSProperties, children?: React.ReactNode }) {
-    const handleClick = () => {
-        if (cell.readonly) return;
-        console.log("CellBase handleClick", cellAddress, cell.value, inputProps.inputMode);
-        inputProps.inputHandler.handleCellClick(inputProps, cell, cellAddress, playerMove, playerId);
-    };
+
 
     const cellSelected = isCellMatch(inputProps.selectedCell, cellAddress);
 
@@ -162,11 +160,21 @@ function CellBase({ inputProps, cell, playerId, playerMove, cellAddress, cellSty
 
     const mouseEnter = () => {
         inputProps.inputHandler.onMouseEnterCell(inputProps, cell, cellAddress, playerMove, playerId);
+    }
 
+    const handleClick = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        console.log("CellBase handleClick", cellAddress, cell.value, inputProps.inputMode);
+        inputProps.inputHandler.handleCellClick(inputProps, cell, cellAddress, playerMove, playerId);
+    };
+
+    const mouseUp = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        inputProps.inputHandler.onMouseUp(inputProps);
     }
 
     return (
-        <div style={style} onMouseDown={handleClick} onMouseUp={() => inputProps.inputHandler.onMouseUp(inputProps)} onMouseEnter={mouseEnter}>
+        <div style={style} onTouchStart={handleClick} onMouseDown={handleClick} onMouseUp={mouseUp} onTouchEnd={mouseUp} onMouseEnter={mouseEnter} onTouchEndCapture={mouseEnter}>
             <div style={innerCellStyle}>
                 {children}
             </div>
@@ -221,10 +229,23 @@ function SudokuBoard({ inputProps, gameState, playerId, playerMove }: SudokuProp
 }
 
 function NumberRow({ inputProps, playerMove, playerId }: { inputProps: InputProps, playerMove: (move: MoveData) => void, playerId: string }) {
+    const buttonStyle = {
+        color: "black",
+        margin: "0px",
+        width: "20px",
+        height: "30px",
+        alignContent: "center",
+        justifyContent: "center",
+        paddingTop: "6px",
+        display: "inline-flex"
+    }
+
     return (
         <div>
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map(number => (
-                <button key={number} onClick={() => inputProps.inputHandler.handleNumberClick(inputProps, number, playerMove, playerId)} style={{ backgroundColor: inputProps.selectedNumber === number ? "lightblue" : "white", color: "black", margin: "2px", width: "30px", height: "30px" }}>
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(number => (
+                <button key={number}
+                    onClick={() => inputProps.inputHandler.handleNumberClick(inputProps, number, playerMove, playerId)}
+                    style={{ ...buttonStyle, backgroundColor: inputProps.selectedNumber === number ? "lightblue" : "white" }}>
                     {number}
                 </button>
             ))}
@@ -313,7 +334,7 @@ export default function Sudoku({ gameState, playerId, playerMove }: SudokuProps)
             const num = parseInt(e.key);
             if (!isNaN(num) && num >= 1 && num <= 9) {
                 inputHandler.handleNumberClick(inputProps, num, playerMove, playerId);
-            } else if (e.key === "Backspace" || e.key === "Delete" || e.key === " " ) {
+            } else if (e.key === "Backspace" || e.key === "Delete" || e.key === " ") {
                 inputHandler.handleClearButtonPress(inputProps, selectedCell, playerMove, playerId);
             }
         };
@@ -323,11 +344,22 @@ export default function Sudoku({ gameState, playerId, playerMove }: SudokuProps)
     }, [inputMode, selectedCell, selectedNumber]); // include any state the handler reads
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-            <h1>Sudoku</h1>
-            <SudokuBoard inputProps={inputProps} gameState={gameState} playerId={playerId} playerMove={playerMove} />
-            <InputModeSelector inputProps={inputProps} />
-            <NumberRow inputProps={inputProps} playerMove={playerMove} playerId={playerId} />
+        <div style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            overflow: "hidden",
+            overscrollBehavior: "none" /* Prevents pull-to-refresh & bounce */
+        }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <h1>Sudoku</h1>
+                <SudokuBoard inputProps={inputProps} gameState={gameState} playerId={playerId} playerMove={playerMove} />
+                <InputModeSelector inputProps={inputProps} />
+                <NumberRow inputProps={inputProps} playerMove={playerMove} playerId={playerId} />
+            </div>
         </div>
+
     );
 }
