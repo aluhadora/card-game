@@ -254,6 +254,7 @@ export default function Sudoku({
                     "none" /* Prevents pull-to-refresh & bounce */,
                 touchAction:
                     "none" /* Prevents pinch-zoom and double-tap zoom */,
+                userSelect: "none",
             }}
         >
             <div
