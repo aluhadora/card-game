@@ -3,19 +3,28 @@ import { GameTypes } from "../constants";
 import { BoardStrategy } from "./boardProvider/boardStrategy";
 import { SudokuGen } from "./boardProvider/sudokuGen";
 import MoveHandler from "./moveHandler";
-import { Cell, MoveContext, MoveData, StartSudokuGame } from "./types";
+import { Cell, MoveContext, MoveData, Puzzle, StartSudokuGame } from "./types";
+import { GameState, GameStates, DifficultyLevels, DifficultyLevel } from "./constants";
 
 export default class SudokuGame implements Game {
     players: Record<string, Player>;
     board: (Cell)[][];
     moveHandler: MoveHandler;
     boardStrategy: BoardStrategy;
+    puzzle: Puzzle;
+    gameState: GameState;
 
     constructor() {
         this.players = {};
         this.board = Array.from({ length: 9 }, () => Array(9).fill({} as Cell));
         this.moveHandler = new MoveHandler();
         this.boardStrategy = new SudokuGen();
+        this.gameState = GameStates.Playing;
+        this.puzzle = {
+            board: this.board,
+            solution: Array.from({ length: 9 }, () => Array(9).fill(0)),
+            difficultyLevel: DifficultyLevels.Easy,
+        };
     }
     
     visibleState(extraData?: Record<string, unknown>): Record<string, unknown> {
@@ -23,7 +32,23 @@ export default class SudokuGame implements Game {
             players: this.players,
             board: this.board,
             gameType: GameTypes.Sudoku,
+            gameState: this.gameState,
+            newBoard: this.newBoard.bind(this),
+            closeGame: this.closeGame.bind(this),
             ...extraData
+        };
+    }
+
+    handleGameFinished(context: MoveContext): MoveContext {
+        if (context.board.some(row => row.some(cell => cell.value === null))) {
+            this.gameState = GameStates.Playing;
+        } else if (context.board.every((row, rowIndex) => row.every((cell, colIndex) => cell.value === this.puzzle.solution[rowIndex][colIndex]))) {
+            this.gameState = GameStates.Completed;
+        }
+
+        return {
+            ...context,
+            gameState: this.gameState,
         };
     }
 
@@ -33,10 +58,21 @@ export default class SudokuGame implements Game {
         return this.moveHandler.handleMove(data, context);
     }
 
-    startGame(data: StartSudokuGame): Record<string, unknown> {
-        this.board = this.boardStrategy.generateBoard(data.difficultyLevel || "easy");
+    newBoard(data: { difficultyLevel?: DifficultyLevel } | undefined | null): MoveContext {
+        this.puzzle = this.boardStrategy.generateBoard(data?.difficultyLevel || DifficultyLevels.Easy);
+        this.board = this.puzzle.board;
+        this.gameState = GameStates.Playing;
 
-        return this.visibleState();
+        return this.visibleState() as MoveContext;
+    }
+
+    closeGame(): MoveContext {
+        this.gameState = GameStates.GameOver;
+        return this.visibleState() as MoveContext;
+    }
+
+    startGame(data: StartSudokuGame): Record<string, unknown> {
+        return this.newBoard({ difficultyLevel: data.difficultyLevel });
     }
 
     addPlayer(data: AddPlayerPayload): void {

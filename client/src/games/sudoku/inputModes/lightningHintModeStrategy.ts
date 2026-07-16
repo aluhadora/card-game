@@ -13,20 +13,9 @@ export class LightningHintModeStrategy implements InputModeStrategy {
     ): void {
         const { selectedNumber, setDragging, setDragClearing } = inputProps;
 
-        console.log(
-            "LightningHintModeStrategy handleCellClick",
-            cellAddress,
-            cell.value,
-            selectedNumber,
-        );
-        console.log("Setting dragging to true");
         setDragging(true);
 
         if (selectedNumber !== null && cell.value === null) {
-            console.log(
-                "Setting dragClearing to",
-                cell.hints.some((hint) => hint.value === selectedNumber),
-            );
             setDragClearing(
                 cell.hints.some((hint) => hint.value === selectedNumber),
             );

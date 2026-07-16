@@ -50,14 +50,6 @@ export class InputModeStrategyHandler implements InputModeStrategy {
         playerMove: (move: MoveData) => void,
         playerId: string,
     ) {
-        console.log(
-            "InputModeStrategyHandler handleCellClick",
-            cellAddress,
-            cell.value,
-            inputProps.inputMode,
-        );
-        console.log("InputMode", this.inputMode);
-
         this.inputStrategy().handleCellClick(
             inputProps,
             cell,
@@ -100,7 +92,6 @@ export class InputModeStrategyHandler implements InputModeStrategy {
     }
 
     onMouseUp(inputProps: InputHandlerProps) {
-        console.log("Setting dragging to false");
         inputProps.setDragging(false);
     }
 

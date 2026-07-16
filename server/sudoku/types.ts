@@ -1,10 +1,16 @@
 import { BasePlayerMovePayload, Player, StartGamePayload } from "../types";
-import { DifficultyLevel, MoveType } from "./constants";
+import { DifficultyLevel, GameState, MoveType } from "./constants";
 
 export type Hint = {
     value: number;
     createdBy: string;
 }
+
+export type Puzzle = {
+    board: Cell[][];
+    solution: number[][];
+    difficultyLevel: DifficultyLevel;
+};
 
 export type Cell = {
     value: number | null;
@@ -21,7 +27,10 @@ export type MoveData = BasePlayerMovePayload & {
 }
 
 export type MoveContext = {
+    newBoard(): MoveContext;
+    closeGame(): MoveContext;
     board: Cell[][];
+    gameState: GameState;
 }
 
 export type StartSudokuGame = StartGamePayload & {

@@ -1,9 +1,9 @@
-import { DifficultyLevel, MoveType } from "./constants";
+import { DifficultyLevel, MoveType, GameState } from "./constants";
 
 export type Hint = {
     value: number;
     createdBy: string;
-}
+};
 
 export type Cell = {
     value: number | null;
@@ -11,26 +11,27 @@ export type Cell = {
     confirmed: boolean;
     hints: Hint[];
     createdBy: string | null;
-}
+};
 
 export type MoveData = {
     moveType: MoveType;
     cellAddress: [number, number];
     value: number | null;
     playerId: string;
-}
+};
 
 export type MoveContext = {
     board: Cell[][];
-}
+    gameState: GameState;
+};
 
 export type StartSudokuGame = {
     difficultyLevel: DifficultyLevel;
     gameType: "sudoku";
-}
+};
 
 export type Player = {
     playerId: string;
     name: string;
     color: string;
-}
+};

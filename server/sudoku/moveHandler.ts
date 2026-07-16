@@ -167,6 +167,14 @@ function toggleHint(moveData: MoveData, context: MoveContext) : MoveContext {
     return context;
 }
 
+function newBoardMove(moveData: MoveData, context: MoveContext) : MoveContext {
+    return context.newBoard();
+}
+
+function closeGameMove(moveData: MoveData, context: MoveContext) : MoveContext {
+    return context.closeGame();
+}
+
 export default class MoveHandler {
     moveValidator: MoveValidator;
     moveDictionary: Record<string, (moveData: MoveData, context : MoveContext) => MoveContext>;
@@ -179,6 +187,8 @@ export default class MoveHandler {
         this.moveDictionary[MoveTypes.ToggleHint] = toggleHint;
         this.moveDictionary[MoveTypes.ClearHint] = clearHintMove;
         this.moveDictionary[MoveTypes.AddHint] = addHintMove;
+        this.moveDictionary[MoveTypes.NewBoard] = newBoardMove;
+        this.moveDictionary[MoveTypes.CloseGame] = closeGameMove;
     }
 
     handleMove(moveData : MoveData, context : MoveContext) : MoveContext | undefined {

@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
-import { InputMode } from "../constants";
+import React, { useEffect, useState } from "react";
+import styles from "./sudoku.module.css";
+import { InputMode, GameState, GameStates, MoveTypes } from "../constants";
 import { Cell, MoveData, Player } from "../types";
 import {
     InputModeStrategyHandler,
@@ -13,6 +14,7 @@ import { CellGroup } from "./cellsComponents";
 export type SudokuGameState = {
     board: Cell[][];
     players: Record<string, Player>;
+    gameState: GameState;
 };
 
 export type SudokuProps = {
@@ -82,7 +84,7 @@ function NumberRow({
 
     return (
         <div>
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((number) => (
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map((number) => (
                 <button
                     key={number}
                     onClick={() =>
@@ -104,6 +106,47 @@ function NumberRow({
                     {number}
                 </button>
             ))}
+        </div>
+    );
+}
+
+function GameCompleteRow({
+    gameState,
+    playerMove,
+    playerId,
+}: {
+    gameState: SudokuGameState;
+    playerMove: (move: MoveData) => void;
+    playerId: string;
+}) {
+    // if (gameState.gameState !== GameStates.Completed) return null;
+
+    return (
+        <div>
+            <button
+                onClick={() =>
+                    playerMove({
+                        moveType: MoveTypes.NewBoard,
+                        playerId,
+                        cellAddress: [0, 0],
+                        value: null,
+                    })
+                }
+            >
+                New Board
+            </button>
+            <button
+                onClick={() =>
+                    playerMove({
+                        moveType: MoveTypes.CloseGame,
+                        playerId,
+                        cellAddress: [0, 0],
+                        value: null,
+                    })
+                }
+            >
+                Close Game
+            </button>
         </div>
     );
 }
@@ -213,8 +256,6 @@ export default function Sudoku({
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            console.log("Key pressed:", e.key);
-
             const num = parseInt(e.key);
             if (!isNaN(num) && num >= 1 && num <= 9) {
                 inputHandler.handleNumberClick(
@@ -241,6 +282,7 @@ export default function Sudoku({
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, [inputMode, selectedCell, selectedNumber]); // include any state the handler reads
 
+    if (gameState.gameState === GameStates.GameOver) return null;
     return (
         <div
             style={{
@@ -257,23 +299,31 @@ export default function Sudoku({
                 userSelect: "none",
             }}
         >
-            <div
-                style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                }}
-            >
-                <h1>Sudoku</h1>
-                <SudokuBoard
-                    inputProps={inputProps}
+            <div>
+                <div
+                    style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                    }}
+                >
+                    <h1>Sudoku</h1>
+                    <SudokuBoard
+                        inputProps={inputProps}
+                        gameState={gameState}
+                        playerId={playerId}
+                        playerMove={playerMove}
+                    />
+                    <InputModeSelector inputProps={inputProps} />
+                    <NumberRow
+                        inputProps={inputProps}
+                        playerMove={playerMove}
+                        playerId={playerId}
+                    />
+                </div>
+
+                <GameCompleteRow
                     gameState={gameState}
-                    playerId={playerId}
-                    playerMove={playerMove}
-                />
-                <InputModeSelector inputProps={inputProps} />
-                <NumberRow
-                    inputProps={inputProps}
                     playerMove={playerMove}
                     playerId={playerId}
                 />

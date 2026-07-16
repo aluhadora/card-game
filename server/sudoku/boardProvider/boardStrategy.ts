@@ -1,6 +1,6 @@
 import { DifficultyLevel } from "../constants";
-import { Cell } from "../types";
+import { Cell, Puzzle } from "../types";
 
 export interface BoardStrategy {
-    generateBoard(difficultyLevel: DifficultyLevel): Cell[][];
+    generateBoard(difficultyLevel: DifficultyLevel): Puzzle;
 }

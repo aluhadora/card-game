@@ -147,7 +147,7 @@ export default function App() {
     };
 
     const sendMessage = (message) => {
-        console.log("Sending message:", message);
+        console.debug("Sending message:", message);
         socket.emit("send-chat-message", {
             pin: gameId,
             playerId: playerId,
@@ -160,7 +160,7 @@ export default function App() {
     };
 
     const playerMove = (moveData) => {
-        // console.log("Moving", moveData);
+        console.debug("Moving", moveData);
         socket.emit("player-move", {
             ...moveData,
             playerId: playerId,
@@ -173,17 +173,6 @@ export default function App() {
         () =>
             createTheme({ palette: { mode: prefersDark ? "dark" : "light" } }),
         [prefersDark],
-    );
-
-    console.log(
-        "App render: gameId",
-        gameId,
-        "playerId",
-        playerId,
-        "connected",
-        connected,
-        "started",
-        started,
     );
 
     return (
