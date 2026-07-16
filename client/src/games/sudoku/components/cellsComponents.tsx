@@ -147,7 +147,7 @@ function determineCellBackgroundColor(
         return "lightblue";
     if (cellHovered) return isDarkMode ? "whitesmoke" : "lightgrey";
     if (cellNeighborHovered || cellNeighborSelected)
-        return isDarkMode ? "#dedfe4e0" : "#dedfe4c0";
+        return isDarkMode ? "#dedfe4ff" : "#dedfe4c0";
 
     return "white";
 }

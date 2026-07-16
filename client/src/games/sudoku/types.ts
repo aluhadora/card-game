@@ -1,4 +1,6 @@
-import { DifficultyLevel, MoveType, GameState } from "./constants";
+import { GameSettings } from "../../components/types";
+import { GameType } from "../../constants";
+import { DifficultyLevel, MoveType, GameState, GameMode } from "./constants";
 
 export type Hint = {
     value: number;
@@ -35,3 +37,11 @@ export type Player = {
     name: string;
     color: string;
 };
+
+export interface SudokuGameSettings extends GameSettings {
+    gameType: GameType;
+    gameMode?: GameMode;
+    difficultyLevel?: DifficultyLevel;
+    allowAutoPencil?: boolean;
+    autoCheckAnswers?: boolean;
+}

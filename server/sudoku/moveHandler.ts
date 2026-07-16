@@ -50,7 +50,7 @@ function setCellValue(moveData: MoveData, context: MoveContext) : MoveContext {
 }
 
 function clearHint(cell: Cell, value: number | null) {
-    if (value === null) {
+    if (value === null || value === 0 || value === undefined) {
         cell.hints = [];
     } else {
         const existingHintIndex = cell.hints.findIndex(hint => hint.value === value);
@@ -167,11 +167,13 @@ function toggleHint(moveData: MoveData, context: MoveContext) : MoveContext {
     return context;
 }
 
-function newBoardMove(moveData: MoveData, context: MoveContext) : MoveContext {
+function newBoardMove(_moveData: MoveData, context: MoveContext) : MoveContext {
+    console.log("Creating new board...");
     return context.newBoard();
 }
 
-function closeGameMove(moveData: MoveData, context: MoveContext) : MoveContext {
+function closeGameMove(_moveData: MoveData, context: MoveContext) : MoveContext {
+    console.log("Move -- Closing game...");
     return context.closeGame();
 }
 
@@ -189,11 +191,24 @@ export default class MoveHandler {
         this.moveDictionary[MoveTypes.AddHint] = addHintMove;
         this.moveDictionary[MoveTypes.NewBoard] = newBoardMove;
         this.moveDictionary[MoveTypes.CloseGame] = closeGameMove;
+        this.moveDictionary[MoveTypes.AutoFillPencilHints] = autoFillPencilHintsMove;
+        this.moveDictionary[MoveTypes.AutoSolve] = autoSolveMove;
     }
 
     handleMove(moveData : MoveData, context : MoveContext) : MoveContext | undefined {
-        if (!this.moveValidator.validateMove(moveData, context)) return;
-        
+        if (!this.moveValidator.validateMove(moveData, context)) {
+            console.log(`Invalid move attempted by player ${moveData.playerId}:`, moveData);
+            return;
+        }
+
         return this.moveDictionary[moveData.moveType](moveData, context);
     }
+}
+
+function autoFillPencilHintsMove(_moveData: MoveData, context: MoveContext): MoveContext {
+    return context.autoPencilBoard();
+}
+
+function autoSolveMove(_moveData: MoveData, context: MoveContext): MoveContext {
+    return context.autoSolveBoard();
 }

@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./sudoku.module.css";
 import { InputMode, GameState, GameStates, MoveTypes } from "../constants";
+
 import { Cell, MoveData, Player } from "../types";
 import {
     InputModeStrategyHandler,
     InputHandlerProps,
 } from "../inputModes/inputHandler";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import FormGroup from "@mui/material/FormGroup";
 import { CellGroup } from "./cellsComponents";
+import OptionsDrawer, { MenuButton } from "./optionsDrawer";
+import { InputModeSelector, NumberRow } from "./inputControls";
 
 export type SudokuGameState = {
     board: Cell[][];
@@ -62,54 +62,6 @@ function SudokuBoard({
     );
 }
 
-function NumberRow({
-    inputProps,
-    playerMove,
-    playerId,
-}: {
-    inputProps: InputHandlerProps;
-    playerMove: (move: MoveData) => void;
-    playerId: string;
-}) {
-    const buttonStyle = {
-        color: "black",
-        margin: "0px",
-        width: "20px",
-        height: "30px",
-        alignContent: "center",
-        justifyContent: "center",
-        paddingTop: "6px",
-        display: "inline-flex",
-    };
-
-    return (
-        <div>
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map((number) => (
-                <button
-                    key={number}
-                    onClick={() =>
-                        inputProps.inputHandler.handleNumberClick(
-                            inputProps,
-                            number,
-                            playerMove,
-                            playerId,
-                        )
-                    }
-                    style={{
-                        ...buttonStyle,
-                        backgroundColor:
-                            inputProps.selectedNumber === number
-                                ? "lightblue"
-                                : "white",
-                    }}
-                >
-                    {number}
-                </button>
-            ))}
-        </div>
-    );
-}
-
 function GameCompleteRow({
     gameState,
     playerMove,
@@ -119,10 +71,10 @@ function GameCompleteRow({
     playerMove: (move: MoveData) => void;
     playerId: string;
 }) {
-    // if (gameState.gameState !== GameStates.Completed) return null;
+    if (gameState.gameState !== GameStates.Completed) return null;
 
     return (
-        <div>
+        <div className={styles.gameCompleteRow}>
             <button
                 onClick={() =>
                     playerMove({
@@ -151,55 +103,18 @@ function GameCompleteRow({
     );
 }
 
-function InputModeSelector({ inputProps }: { inputProps: InputHandlerProps }) {
-    const { inputMode, setInputMode, setSelectedCell, setSelectedNumber } =
-        inputProps;
-    const lightningMode =
-        inputMode === InputMode.Lightning ||
-        inputMode === InputMode.LightningHint;
-    const hintMode =
-        inputMode === InputMode.StandardHint ||
-        inputMode === InputMode.LightningHint;
+function numberIsComplete(board: Cell[][], number: number): boolean {
+    return board.flat().filter((cell) => cell.value === number).length === 9;
+}
 
-    const changeMode = (lightning: boolean, hint: boolean) => {
-        if (lightning && !hint) {
-            setInputMode(InputMode.Lightning);
-            setSelectedCell(null);
-        } else if (lightning && hint) {
-            setInputMode(InputMode.LightningHint);
-            setSelectedCell(null);
-        } else if (!lightning && hint) {
-            setInputMode(InputMode.StandardHint);
-            setSelectedNumber(null);
-        } else {
-            setInputMode(InputMode.Standard);
-            setSelectedNumber(null);
-        }
-    };
+function FinaleFanfare({ gameState }: { gameState: SudokuGameState }) {
+    if (gameState.gameState !== GameStates.Completed) return null;
 
     return (
-        <FormGroup row>
-            <FormControlLabel
-                control={
-                    <Checkbox
-                        checked={lightningMode}
-                        onChange={(e) => changeMode(e.target.checked, hintMode)}
-                    />
-                }
-                label="Lightning Mode"
-            />
-            <FormControlLabel
-                control={
-                    <Checkbox
-                        checked={hintMode}
-                        onChange={(e) =>
-                            changeMode(lightningMode, e.target.checked)
-                        }
-                    />
-                }
-                label="Hint Mode"
-            />
-        </FormGroup>
+        <>
+            <div className={styles.firework}></div>
+            <div className={styles.block}></div>
+        </>
     );
 }
 
@@ -231,6 +146,14 @@ export default function Sudoku({
     );
     const [dragging, setDragging] = useState<boolean>(false);
     const [dragClearing, setDragClearing] = useState<boolean>(false);
+    const [lastMove, setLastMove] = useState<MoveData | null>(null);
+
+    const handlePlayerMove = (move: MoveData) => {
+        setLastMove(move);
+        playerMove(move);
+    };
+
+    const [drawerOpen, setDrawerOpen] = useState(false);
 
     const inputHandler = new InputModeStrategyHandler(inputMode);
 
@@ -261,7 +184,7 @@ export default function Sudoku({
                 inputHandler.handleNumberClick(
                     inputProps,
                     num,
-                    playerMove,
+                    handlePlayerMove,
                     playerId,
                 );
             } else if (
@@ -272,7 +195,7 @@ export default function Sudoku({
                 inputHandler.handleClearButtonPress(
                     inputProps,
                     selectedCell,
-                    playerMove,
+                    handlePlayerMove,
                     playerId,
                 );
             }
@@ -282,52 +205,98 @@ export default function Sudoku({
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, [inputMode, selectedCell, selectedNumber]); // include any state the handler reads
 
-    if (gameState.gameState === GameStates.GameOver) return null;
+    useEffect(() => {
+        if (
+            !lastMove ||
+            lastMove.moveType !== MoveTypes.SetCellValue ||
+            !selectedNumber
+        ) {
+            return;
+        }
+
+        const value = lastMove.value;
+
+        if (numberIsComplete(gameState.board, value || 0)) {
+            const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+            const orderedNumbers = [
+                ...numbers.slice(value!),
+                ...numbers.slice(0, value!),
+            ];
+            const nextNonCompleteNumber = orderedNumbers.find(
+                (num) => !numberIsComplete(gameState.board, num),
+            );
+            setSelectedNumber(nextNonCompleteNumber || null);
+        }
+    }, [lastMove, gameState.board]);
+
+    if (gameState.gameState === GameStates.GameOver) {
+        return <div>Game Over! Thanks for playing!</div>;
+    }
+
     return (
-        <div
-            style={{
-                position: "fixed",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-                overflow: "hidden",
-                overscrollBehavior:
-                    "none" /* Prevents pull-to-refresh & bounce */,
-                touchAction:
-                    "none" /* Prevents pinch-zoom and double-tap zoom */,
-                userSelect: "none",
-            }}
-        >
-            <div>
-                <div
-                    style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                    }}
-                >
-                    <h1>Sudoku</h1>
-                    <SudokuBoard
-                        inputProps={inputProps}
+        <>
+            <MenuButton onClick={() => setDrawerOpen(true)} />
+            <OptionsDrawer
+                isOpen={drawerOpen}
+                onClose={() => setDrawerOpen(false)}
+                inputProps={inputProps}
+                playerMove={handlePlayerMove}
+                playerId={playerId}
+            />
+            <div
+                style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    overflow: "hidden",
+                    overscrollBehavior:
+                        "none" /* Prevents pull-to-refresh & bounce */,
+                    touchAction:
+                        "none" /* Prevents pinch-zoom and double-tap zoom */,
+                    userSelect: "none",
+                    alignItems: "center",
+                }}
+            >
+                <div style={{ display: "flex", justifyContent: "center" }}>
+                    <div style={{ position: "relative", width: "fit-content" }}>
+                        <FinaleFanfare gameState={gameState} />
+                        <div
+                            style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                            }}
+                        >
+                            <h1>Sudoku</h1>
+                            <SudokuBoard
+                                inputProps={inputProps}
+                                gameState={gameState}
+                                playerId={playerId}
+                                playerMove={handlePlayerMove}
+                            />
+                            <InputModeSelector
+                                gameState={gameState}
+                                inputProps={inputProps}
+                            />
+                            <NumberRow
+                                inputProps={inputProps}
+                                gameState={gameState}
+                                playerMove={handlePlayerMove}
+                                playerId={playerId}
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div className={styles.gameCompleteOverlay}>
+                    <GameCompleteRow
                         gameState={gameState}
-                        playerId={playerId}
-                        playerMove={playerMove}
-                    />
-                    <InputModeSelector inputProps={inputProps} />
-                    <NumberRow
-                        inputProps={inputProps}
-                        playerMove={playerMove}
+                        playerMove={handlePlayerMove}
                         playerId={playerId}
                     />
                 </div>
-
-                <GameCompleteRow
-                    gameState={gameState}
-                    playerMove={playerMove}
-                    playerId={playerId}
-                />
             </div>
-        </div>
+        </>
     );
 }

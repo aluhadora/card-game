@@ -1,5 +1,5 @@
 import { BasePlayerMovePayload, Player, StartGamePayload } from "../types";
-import { DifficultyLevel, GameState, MoveType } from "./constants";
+import { DifficultyLevel, GameMode, GameState, MoveType } from "./constants";
 
 export type Hint = {
     value: number;
@@ -29,6 +29,8 @@ export type MoveData = BasePlayerMovePayload & {
 export type MoveContext = {
     newBoard(): MoveContext;
     closeGame(): MoveContext;
+    autoPencilBoard(): MoveContext;
+    autoSolveBoard(): MoveContext;
     board: Cell[][];
     gameState: GameState;
 }
@@ -39,4 +41,11 @@ export type StartSudokuGame = StartGamePayload & {
 
 export type SudokuPlayer = Player & { 
     color: string;
+}
+
+export interface SudokuGameSettings extends StartGamePayload {
+    gameMode: GameMode;
+    difficultyLevel: DifficultyLevel;
+    allowAutoPencil: boolean;
+    autoCheckAnswers: boolean;
 }

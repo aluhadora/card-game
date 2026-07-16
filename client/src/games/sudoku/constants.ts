@@ -7,6 +7,8 @@ export const MoveTypes = {
     AddHint: "AddHint",
     NewBoard: "NewBoard",
     CloseGame: "CloseGame",
+    AutoFillPencilHints: "AutoFillPencilHints",
+    AutoSolve: "AutoSolve",
 } as const;
 
 export type MoveType = (typeof MoveTypes)[keyof typeof MoveTypes];
@@ -39,3 +41,11 @@ export const InputMode = {
 } as const;
 
 export type InputMode = (typeof InputMode)[keyof typeof InputMode];
+
+export const GameModes = {
+    Cooperative: "Cooperative",
+    Versus: "Versus",
+    VersusBlitz: "VersusBlitz",
+} as const;
+
+export type GameMode = (typeof GameModes)[keyof typeof GameModes];

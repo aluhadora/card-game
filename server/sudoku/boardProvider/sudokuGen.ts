@@ -20,6 +20,8 @@ export class SudokuGen implements BoardStrategy {
     generateBoard(difficultyLevel: DifficultyLevel): Puzzle {
         const { puzzle, solution, difficulty } = getSudoku(difficultyLevel.toLocaleLowerCase() as any);
 
+        console.log(`Generated ${difficulty} Sudoku Puzzle: ${puzzle}`);
+
         return {
             board: this.convertPuzzleStringToBoard(puzzle),
             solution: solution.split("").map((value) => parseInt(value)).reduce((rows, value, index) => {

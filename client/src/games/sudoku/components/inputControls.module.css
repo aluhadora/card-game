@@ -1,0 +1,45 @@
+.inputCheckbox {
+    margin-left: 0;
+    margin-top: 8px;
+    margin-right: 0;
+    border: 1px solid lightgray;
+    border-radius: 10px;
+    width: 170px;
+}
+
+.inputCheckbox.active {
+    background-color: lightblue;
+}
+
+.numberButton {
+    color: black;
+    margin: 0px;
+    width: 20px;
+    height: 45px;
+    align-content: center;
+    justify-content: center;
+    padding-top: 6px;
+    display: inline-flex;
+    background-color: white;
+    border: 1px solid lightgray;
+    margin-top: 4px;
+}
+
+.zeroButton {
+    color: transparent;
+    background-image: url("../../../../public/images/icons/eraser.svg");
+    background-repeat: no-repeat;
+}
+
+.numberButton.active {
+    background-color: lightblue;
+}
+
+.eraserIcon {
+    margin-top: -2px;
+    width: 20px;
+    height: 20px;
+    background-image: url("../../../../public/images/icons/eraser.svg");
+    background-repeat: no-repeat;
+    background-size: contain;
+}
