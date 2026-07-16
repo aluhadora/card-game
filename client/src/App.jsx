@@ -1,22 +1,21 @@
-import { useState, useMemo } from 'react';
-import './App.css'
-import io from 'socket.io-client';
-import ConnectionManager from './components/connectionManager';
-import { animationTime } from './logic/animationConfiguration';
-import MessagesPanel from './components/messagesPanel';
-import GameBoard from './components/gameBoard';
-import AnimationHandler from './games/common/components/animationHandler';
-import useDeckPreloader from './hooks/useDeckPreloader';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { useMediaQuery } from '@mui/material';
-import CssBaseline from '@mui/material/CssBaseline';
+import { useState, useMemo } from "react";
+import "./App.css";
+import io from "socket.io-client";
+import ConnectionManager from "./components/connectionManager";
+import { animationTime } from "./logic/animationConfiguration";
+import MessagesPanel from "./components/messagesPanel";
+import GameBoard from "./components/gameBoard";
+import AnimationHandler from "./games/common/components/animationHandler";
+import useDeckPreloader from "./hooks/useDeckPreloader";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { useMediaQuery } from "@mui/material";
+import CssBaseline from "@mui/material/CssBaseline";
 
 export default function App() {
-
     useDeckPreloader();
 
     const params = new URLSearchParams(window.location.search);
-    const searchTerm = params.get('pin');
+    const searchTerm = params.get("pin");
     const [gameId, setGameId] = useState(searchTerm || "");
     const [messages, setMessages] = useState([]);
     const [playerId, setPlayerId] = useState(null);
@@ -28,31 +27,33 @@ export default function App() {
 
     const updateQuery = (newParams) => {
         const newUrl = `${window.location.pathname}?${newParams.toString()}`;
-        window.history.pushState({}, '', newUrl);
+        window.history.pushState({}, "", newUrl);
     };
 
     const [animationDeltas, setAnimationDeltas] = useState([]);
 
     const addPlayer = (playerData) => {
-        setMessages(messages => [...messages, { playerJoined: playerData }]);
+        setMessages((messages) => [...messages, { playerJoined: playerData }]);
 
-        const existingPlayer = players.find(player => player.id === playerData.id);
+        const existingPlayer = players.find(
+            (player) => player.id === playerData.id,
+        );
         if (existingPlayer) {
             return;
         }
 
-        setPlayers(players => [...players, playerData]);
-    }
+        setPlayers((players) => [...players, playerData]);
+    };
 
     const startGame = (settings) => {
         socket.emit("start-game", { pin: gameId, ...settings });
-    }
+    };
 
     const gameStarted = (data) => {
-        setMessages(messages => [...messages, { gameStarted: data }]);
+        setMessages((messages) => [...messages, { gameStarted: data }]);
         setDeltas([data]); // Store the initial state
         setStarted(true);
-    }
+    };
 
     const getRoomState = async () => {
         const url = `${import.meta.env.VITE_HTTP_SERVER_URL || "/"}api/rooms/${gameId}`;
@@ -60,7 +61,10 @@ export default function App() {
 
         const response = await fetch(url);
         if (!response.ok) {
-            console.log("Failed to fetch room state, response not ok:", response);
+            console.log(
+                "Failed to fetch room state, response not ok:",
+                response,
+            );
             throw new Error("Room not found or error in fetching state.");
         }
 
@@ -69,7 +73,7 @@ export default function App() {
         setDeltas([data.gameState]);
 
         return data;
-    }
+    };
 
     const joinGame = async (nickname, playerId, playerSecret) => {
         if (!gameId || !gameId.trim().length) {
@@ -78,7 +82,7 @@ export default function App() {
         }
 
         const newParams = new URLSearchParams();
-        newParams.set('pin', gameId);
+        newParams.set("pin", gameId);
         updateQuery(newParams);
 
         const serverUrl = import.meta.env.VITE_SERVER_URL;
@@ -91,16 +95,22 @@ export default function App() {
 
         // Use direct URL for local dev (e.g. http://localhost:3001), otherwise proxy through nginx
         console.log("serverUrl", serverUrl);
-        const socket = (serverUrl && serverUrl.startsWith('http'))
-            ? io(serverUrl)
-            : io({ path: "/socket.io" });
+        const socket =
+            serverUrl && serverUrl.startsWith("http")
+                ? io(serverUrl)
+                : io({ path: "/socket.io" });
         socket.on("connect", () => setPlayerId(playerId));
 
-        socket.emit("player-joined", { pin: gameId, playerId: playerId, playerSecret: playerSecret, nickname: nickname });
-        socket.on('room-joined', data => addPlayer(data));
-        socket.on('game-started', gameStarted);
-        socket.on('player-move', playerMoved);
-        socket.on('message-received', messageReceived);
+        socket.emit("player-joined", {
+            pin: gameId,
+            playerId: playerId,
+            playerSecret: playerSecret,
+            nickname: nickname,
+        });
+        socket.on("room-joined", (data) => addPlayer(data));
+        socket.on("game-started", gameStarted);
+        socket.on("player-move", playerMoved);
+        socket.on("message-received", messageReceived);
 
         setConnected(true);
         setSocket(socket);
@@ -108,65 +118,108 @@ export default function App() {
         const state = await getRoomState();
         if (state && state.roomstate !== "Lobby") setStarted(true);
 
-        socket.on('disconnect', () => {
+        socket.on("disconnect", () => {
             console.log("Disconnected from server");
             setConnected(false);
         });
-    }
+    };
 
-    const setState = state => {
-        console.log("Setting state:", state);
+    const setState = (state) => {
         setDeltas([state]);
-    }
+    };
 
-    const playerMoved = state => {
-        console.log("Player moved:", state);
+    const playerMoved = (state) => {
         if (state.delta) {
             console.log("Handling animation delta:", state.delta);
-            setAnimationDeltas(deltas => [...deltas, state.delta]);
+            setAnimationDeltas((deltas) => [...deltas, state.delta]);
             setTimeout(() => setState(state), animationTime + 50);
         } else if (state.deltas) {
             console.log("Handling multiple deltas:", state.deltas);
-            setAnimationDeltas(deltas => [...deltas, ...state.deltas]);
+            setAnimationDeltas((deltas) => [...deltas, ...state.deltas]);
             // Deltas within a batch now play in parallel, so timing is
             // constant regardless of batch size.
             setTimeout(() => setState(state), animationTime + 50);
         } else {
-            console.log("Skipping animation");
             setState(state); // Store the new state
         }
 
-        setMessages(messages => [...messages, { playerMoved: state }]);
-    }
+        setMessages((messages) => [...messages, { playerMoved: state }]);
+    };
 
     const sendMessage = (message) => {
         console.log("Sending message:", message);
-        socket.emit("send-chat-message", { pin: gameId, playerId: playerId, message: message });
-    }
+        socket.emit("send-chat-message", {
+            pin: gameId,
+            playerId: playerId,
+            message: message,
+        });
+    };
 
     const messageReceived = (message) => {
-        setMessages(messages => [...messages, { messageReceived: message }]);
-    }
+        setMessages((messages) => [...messages, { messageReceived: message }]);
+    };
 
-    const playerMove = moveData => {
-        console.log("Moving", moveData);
-        socket.emit("player-move", { ...moveData, playerId: playerId, pin: gameId });
-    }
+    const playerMove = (moveData) => {
+        // console.log("Moving", moveData);
+        socket.emit("player-move", {
+            ...moveData,
+            playerId: playerId,
+            pin: gameId,
+        });
+    };
 
-    const prefersDark = useMediaQuery('(prefers-color-scheme: dark)');
-    const theme = useMemo(() => createTheme({ palette: { mode: prefersDark ? 'dark' : 'light' } }), [prefersDark]);
+    const prefersDark = useMediaQuery("(prefers-color-scheme: dark)");
+    const theme = useMemo(
+        () =>
+            createTheme({ palette: { mode: prefersDark ? "dark" : "light" } }),
+        [prefersDark],
+    );
+
+    console.log(
+        "App render: gameId",
+        gameId,
+        "playerId",
+        playerId,
+        "connected",
+        connected,
+        "started",
+        started,
+    );
 
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline>
                 <div>
-                    <ConnectionManager gameId={gameId} setGameId={setGameId} joinGame={joinGame} players={players} playerId={playerId} connected={connected} started={started} startGame={startGame} />
-                    <GameBoard playerMove={playerMove} players={players} state={deltas[0]} playerId={playerId} started={started} />
-                    <AnimationHandler animationDeltas={animationDeltas} setAnimationDeltas={setAnimationDeltas} />
-                    <MessagesPanel messages={messages} sendMessage={sendMessage} socket={socket} gameId={gameId} playerId={playerId} />
+                    <ConnectionManager
+                        gameId={gameId}
+                        setGameId={setGameId}
+                        joinGame={joinGame}
+                        players={players}
+                        playerId={playerId}
+                        connected={connected}
+                        started={started}
+                        startGame={startGame}
+                    />
+                    <GameBoard
+                        playerMove={playerMove}
+                        players={players}
+                        state={deltas[0]}
+                        playerId={playerId}
+                        started={started}
+                    />
+                    <AnimationHandler
+                        animationDeltas={animationDeltas}
+                        setAnimationDeltas={setAnimationDeltas}
+                    />
+                    <MessagesPanel
+                        messages={messages}
+                        sendMessage={sendMessage}
+                        socket={socket}
+                        gameId={gameId}
+                        playerId={playerId}
+                    />
                 </div>
             </CssBaseline>
-
         </ThemeProvider>
-    )
+    );
 }

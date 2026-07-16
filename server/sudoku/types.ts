@@ -1,4 +1,4 @@
-import { BasePlayerMovePayload, StartGamePayload } from "../types";
+import { BasePlayerMovePayload, Player, StartGamePayload } from "../types";
 import { DifficultyLevel, MoveType } from "./constants";
 
 export type Hint = {
@@ -26,4 +26,8 @@ export type MoveContext = {
 
 export type StartSudokuGame = StartGamePayload & {
     difficultyLevel: DifficultyLevel;
+}
+
+export type SudokuPlayer = Player & { 
+    color: string;
 }

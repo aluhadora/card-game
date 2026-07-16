@@ -1,23 +1,17 @@
-Implement Garbage Game
-Backgrounds
-Customizable deck images (S3?)
-Display plan for > 4 players
-Messages Panel
-    Move log
-    Chat
-    Debugging Events/State
-Would love to move sockets from App
-    Maybe useGameSockets hook with a listener dictionary, "event-key": [listeners]
+Connection Screen:
+    Prepopulate gameIDs
+    Game specific settings
+    Persist last used settings
 
-EndGame State
-    You can choose to flip the cards or take from deck or discard (limited to one)
-    In Endgame State change color around remaining players play area
-    When one player turns over cards move to EndGame State
-
-Restarting game from gameover screen
-Keep track of score between games
-
-Settings
-    +  When your turn happens option to notify player
-        Sound/Toast notification
-    https://blog.bitsrc.io/how-to-use-desktop-notifications-with-react-122536954dc2
+Sudoku:
+    Grey out number if complete
+        Advance to next number
+    Validate looks good on mobile
+    Implement "lives mode"
+    Pencil icon if writing hints
+    Implement game finished
+    Implement timer
+    Implement "versus" mode
+    Implement options:
+        Allow auto pencil
+        Difficulty

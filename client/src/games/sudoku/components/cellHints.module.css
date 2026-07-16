@@ -1,0 +1,13 @@
+.cellHint {
+    font-size: 10px;
+    position: absolute;
+    width: 33%;
+    height: 33%;
+    border-radius: 2px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    background-color: red;
+}

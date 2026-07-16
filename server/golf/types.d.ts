@@ -41,6 +41,6 @@ export interface StartGolfGamePayload extends StartGamePayload {
         nickname: string;
         playerSecret: string;
     }>;
-    gameType: 'golf';
+    gameType: 'Golf';
     decks: number;
 }

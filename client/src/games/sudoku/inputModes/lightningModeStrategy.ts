@@ -1,6 +1,6 @@
 import { Cell, MoveData } from "../types";
 import { InputModeStrategy } from "./inputModeStrategy";
-import { InputProps } from "./inputModeStrategyHandler";
+import { InputHandlerProps } from "./inputHandler";
 import { InputMode, MoveTypes } from "../constants";
 
 export class LightningModeStrategy implements InputModeStrategy {
@@ -13,23 +13,24 @@ export class LightningModeStrategy implements InputModeStrategy {
         }
     }
 
-    handleCellClick(inputProps: InputProps, _cell: Cell, cellAddress: [number, number], playerMove: (move: MoveData) => void, playerId: string): void {
+    handleCellClick(inputProps: InputHandlerProps, _cell: Cell, cellAddress: [number, number], playerMove: (move: MoveData) => void, playerId: string): void {
         const { selectedNumber } = inputProps;
 
+        if (_cell)
         inputProps.setDragging(true);
 
         this.setCell(selectedNumber, cellAddress, playerMove, playerId);
     }
 
-    handleNumberClick(inputProps: InputProps, number: number, _playerMove: (move: MoveData) => void, _playerId: string): void {
+    handleNumberClick(inputProps: InputHandlerProps, number: number, _playerMove: (move: MoveData) => void, _playerId: string): void {
         const { setSelectedNumber } = inputProps;
         setSelectedNumber(number);
     }
 
-    onMouseEnterCell(_inputProps: InputProps, _cell: Cell, _cellAddress: [number, number], _playerMove: (move: MoveData) => void, _playerId: string): void {
+    onMouseEnterCell(_inputProps: InputHandlerProps, _cell: Cell, _cellAddress: [number, number], _playerMove: (move: MoveData) => void, _playerId: string): void {
     }
 
-    handleClearButtonPress(inputProps: InputProps, _selectedCell: [number, number] | null, _playerMove: (move: MoveData) => void, _playerId: string): void {
+    handleClearButtonPress(inputProps: InputHandlerProps, _selectedCell: [number, number] | null, _playerMove: (move: MoveData) => void, _playerId: string): void {
         inputProps.setInputMode(InputMode.LightningHint);
     }
 }

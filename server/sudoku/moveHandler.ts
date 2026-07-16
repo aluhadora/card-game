@@ -60,6 +60,60 @@ function clearHint(cell: Cell, value: number | null) {
     }
 }
 
+function clearHintMove(moveData: MoveData, context: MoveContext) : MoveContext {
+    const [row, col] = moveData.cellAddress;
+    const cell = context.board[row][col];
+    clearHint(cell, moveData.value);
+    return context;
+}
+
+function addHintMove(moveData: MoveData, context: MoveContext) : MoveContext {
+    const [row, col] = moveData.cellAddress;
+    const cell = context.board[row][col];
+    if (allowAddHint(moveData.cellAddress, moveData.value!, context)) {
+        addHint(cell, moveData.value!, moveData.playerId);
+    }
+    return context;
+}
+
+function allowAddHint(cellAddress: [number, number], value: number, context: MoveContext): boolean {
+    // Check if value exists in row
+    const [row, col] = cellAddress;
+    for (let c = 0; c < 9; c++) {
+        if (context.board[row][c].value === value) {
+            return false;
+        }
+    }
+
+    // Check if value exists in column
+    for (let r = 0; r < 9; r++) {
+        if (context.board[r][col].value === value) {
+            return false;
+        }
+    }
+
+    // Check if value exists in 3x3 group
+    const groupRow = Math.floor(row / 3) * 3;
+    const groupCol = Math.floor(col / 3) * 3;
+    for (let r = groupRow; r < groupRow + 3; r++) {
+        for (let c = groupCol; c < groupCol + 3; c++) {
+            if (context.board[r][c].value === value) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+function addHint(cell: Cell, value: number, playerId: string) {
+    // Check if value already exists in hints
+    const existingHintIndex = cell.hints.findIndex(hint => hint.value === value && hint.createdBy === playerId);
+    if (existingHintIndex === -1) {
+        cell.hints.push({ value: value, createdBy: playerId });
+    }
+}
+
 function toggleHint(moveData: MoveData, context: MoveContext) : MoveContext {
     const [row, col] = moveData.cellAddress;
     const cell = context.board[row][col];
@@ -123,6 +177,8 @@ export default class MoveHandler {
         this.moveDictionary[MoveTypes.ClearCell] = clearCell;
         this.moveDictionary[MoveTypes.SetCellValue] = setCellValue;
         this.moveDictionary[MoveTypes.ToggleHint] = toggleHint;
+        this.moveDictionary[MoveTypes.ClearHint] = clearHintMove;
+        this.moveDictionary[MoveTypes.AddHint] = addHintMove;
     }
 
     handleMove(moveData : MoveData, context : MoveContext) : MoveContext | undefined {

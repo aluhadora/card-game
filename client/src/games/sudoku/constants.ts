@@ -3,9 +3,11 @@ export const MoveTypes = {
     SetCellValue: "SetCellValue",
     ToggleHint: "ToggleHint",
     ConfirmCellValue: "ConfirmCellValue",
+    ClearHint: "ClearHint",
+    AddHint: "AddHint",
 } as const;
 
-export type MoveType = typeof MoveTypes[keyof typeof MoveTypes];
+export type MoveType = (typeof MoveTypes)[keyof typeof MoveTypes];
 
 export const DifficultyLevels = {
     Easy: "Easy",
@@ -14,7 +16,8 @@ export const DifficultyLevels = {
     Expert: "Expert",
 } as const;
 
-export type DifficultyLevel = typeof DifficultyLevels[keyof typeof DifficultyLevels];
+export type DifficultyLevel =
+    (typeof DifficultyLevels)[keyof typeof DifficultyLevels];
 
 export const InputMode = {
     Standard: "Standard",
@@ -24,4 +27,4 @@ export const InputMode = {
     LightningHint: "LightningHint",
 } as const;
 
-export type InputMode = typeof InputMode[keyof typeof InputMode];
+export type InputMode = (typeof InputMode)[keyof typeof InputMode];

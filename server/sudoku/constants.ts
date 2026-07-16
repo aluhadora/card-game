@@ -3,6 +3,8 @@ export const MoveTypes = {
     SetCellValue: "SetCellValue",
     ToggleHint: "ToggleHint",
     ConfirmCellValue: "ConfirmCellValue",
+    ClearHint: "ClearHint",
+    AddHint: "AddHint",
 } as const;
 
 export type MoveType = typeof MoveTypes[keyof typeof MoveTypes];
