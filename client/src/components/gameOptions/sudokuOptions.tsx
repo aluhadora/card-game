@@ -4,12 +4,11 @@ import MenuItem from "@mui/material/MenuItem";
 import {
     GameMode,
     GameModes,
-    SudokuGameSettings,
-    DifficultyLevel,
     DifficultyLevels,
+    DifficultyLevel,
 } from "../../games/sudoku/constants";
 import Checkbox from "@mui/material/Checkbox";
-import { useEffect } from "react";
+import { SudokuGameSettings } from "../../games/sudoku/types";
 
 export type SudokuOptionsProps = {
     gameSettings: SudokuGameSettings;
@@ -20,18 +19,6 @@ export default function SudokuOptions({
     gameSettings,
     setGameSettings,
 }: SudokuOptionsProps) {
-    useEffect(() => {
-        if (!gameSettings.gameMode) {
-            setGameSettings({
-                ...gameSettings,
-                gameMode: GameModes.Cooperative,
-                difficultyLevel: DifficultyLevels.Easy,
-                allowAutoPencil: false,
-                autoCheckAnswers: false,
-            });
-        }
-    }, [gameSettings, setGameSettings]);
-
     return (
         <>
             <FormControlLabel
@@ -40,7 +27,7 @@ export default function SudokuOptions({
                         variant="outlined"
                         size="small"
                         select
-                        value={gameSettings.gameMode}
+                        value={gameSettings.gameMode ?? GameModes.Cooperative}
                         style={{ minWidth: 150 }}
                         onChange={(e) =>
                             setGameSettings({
@@ -65,7 +52,10 @@ export default function SudokuOptions({
                         variant="outlined"
                         size="small"
                         select
-                        value={gameSettings.difficultyLevel}
+                        value={
+                            gameSettings.difficultyLevel ??
+                            DifficultyLevels.Easy
+                        }
                         style={{ minWidth: 150 }}
                         onChange={(e) =>
                             setGameSettings({
@@ -88,7 +78,7 @@ export default function SudokuOptions({
             <FormControlLabel
                 control={
                     <Checkbox
-                        checked={gameSettings.allowAutoPencil}
+                        checked={gameSettings.allowAutoPencil ?? false}
                         onChange={(e) =>
                             setGameSettings({
                                 ...gameSettings,
@@ -103,7 +93,7 @@ export default function SudokuOptions({
             <FormControlLabel
                 control={
                     <Checkbox
-                        checked={gameSettings.autoCheckAnswers}
+                        checked={gameSettings.autoCheckAnswers ?? false}
                         onChange={(e) =>
                             setGameSettings({
                                 ...gameSettings,

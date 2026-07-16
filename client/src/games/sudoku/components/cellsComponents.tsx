@@ -1,4 +1,3 @@
-import { useEffect, useRef } from "react";
 import { InputHandlerProps } from "../inputModes/inputHandler";
 import { Cell, MoveData } from "../types";
 import { SudokuGameState } from "./sudoku";

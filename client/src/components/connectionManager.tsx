@@ -1,15 +1,13 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import * as uuid from "uuid";
 import { GameType, GameTypes } from "../constants";
 import type { GameSettings, PlayersMap } from "./types";
-import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
-import { ThemeProvider } from "@emotion/react";
 import GameOptions from "./gameOptions";
 
 type RoomJoinedEvent = {
@@ -260,7 +258,6 @@ export default function ConnectionManager({
     setGameId,
     joinGame,
     players,
-    playerId,
     connected,
     started,
     startGame,

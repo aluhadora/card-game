@@ -82,7 +82,17 @@ function deckClick(
     });
 }
 
-function GolfDeckArea({ state, playerMove, playerId, selectedCard }) {
+function GolfDeckArea({
+    state,
+    playerMove,
+    playerId,
+    selectedCard,
+}: {
+    state: GameState | null;
+    playerMove: (move: MoveData) => void;
+    playerId: string;
+    selectedCard: CardData | null;
+}) {
     if (!state) return null;
 
     return (
