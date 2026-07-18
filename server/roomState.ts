@@ -53,7 +53,7 @@ export default class RoomState {
         } else if (player) {
             console.error(`Player ${data.nickname} failed to rejoin: invalid secret.`);
             return;
-        } else if (this.roomstate === "Lobby") {
+        } else if (this.roomstate === "Lobby" || this.gameState.allowLateJoin()) {
             this.joinNewPlayer(data);
             console.log(`New player ${data.nickname} joined the room.`);
         } else {

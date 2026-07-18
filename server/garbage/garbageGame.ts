@@ -40,6 +40,10 @@ export default class GarbageGame implements Game {
         };
     }
 
+    allowLateJoin(): boolean {
+        return this.gameState === GameStates.Opening
+    }
+
     addPlayer(playerData : any) {
         const playerId = playerData.playerId || playerData.id;
         const playerName = playerData.nickname || playerData.name;

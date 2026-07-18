@@ -23,6 +23,10 @@ export default class GolfGame implements Game {
         this.moveHandler = new MoveHandler();
     }
 
+    allowLateJoin(): boolean {
+        return this.gameState === GameStates.Opening;
+    }
+
     allPlayers(): Player[] {
         return Object.values(this.players);
     }

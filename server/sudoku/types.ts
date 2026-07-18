@@ -28,11 +28,11 @@ export type MoveData = BasePlayerMovePayload & {
 
 export type MoveContext = {
     newBoard(): MoveContext;
-    closeGame(): MoveContext;
-    autoPencilBoard(): MoveContext;
-    autoSolveBoard(): MoveContext;
+    settings: SudokuGameSettings;
+    players: Record<string, Player>;
     board: Cell[][];
     gameState: GameState;
+    puzzleSolution: number[][];
 }
 
 export type StartSudokuGame = StartGamePayload & {

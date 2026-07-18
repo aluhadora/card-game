@@ -35,6 +35,10 @@ export default class SudokuGame implements Game {
             pin: "",
         };
     }
+
+    allowLateJoin(): boolean {
+        return true;
+    }
     
     visibleState(extraData?: Record<string, unknown>): Record<string, unknown> {
         return {
@@ -43,9 +47,7 @@ export default class SudokuGame implements Game {
             gameType: GameTypes.Sudoku,
             gameState: this.gameState,
             newBoard: this.newBoard.bind(this),
-            closeGame: this.closeGame.bind(this),
-            autoPencilBoard: this.autoPencilBoard.bind(this),
-            autoSolveBoard: this.autoSolveBoard.bind(this),
+            puzzleSolution: this.puzzle.solution,
             settings: this.settings,
             ...extraData
         };
@@ -77,74 +79,7 @@ export default class SudokuGame implements Game {
         this.puzzle = this.boardStrategy.generateBoard(settings?.difficultyLevel || DifficultyLevels.Easy);
         this.board = this.puzzle.board;
         this.gameState = GameStates.Playing;
-        if (settings?.allowAutoPencil) {
-            this.autoPencilBoard();
-        }
 
-        return this.visibleState() as MoveContext;
-    }
-
-    getPossibleValues(row: number, col: number): number[] {
-        const possibleValues = new Set<number>([1, 2, 3, 4, 5, 6, 7, 8, 9]);
-
-        // Remove values from the same row
-        for (let c = 0; c < 9; c++) {
-            const value = this.board[row][c].value;
-            if (value !== null) {
-                possibleValues.delete(value);
-            }
-        }
-
-        for (let r = 0; r < 9; r++) {
-            const value = this.board[r][col].value;
-            if (value !== null) {
-                possibleValues.delete(value);
-            }
-        }
-
-        const groupRow = Math.floor(row / 3) * 3;
-        const groupCol = Math.floor(col / 3) * 3;
-
-        for (let r = groupRow; r < groupRow + 3; r++) {
-            for (let c = groupCol; c < groupCol + 3; c++) {
-                const value = this.board[r][c].value;
-                if (value !== null) {
-                    possibleValues.delete(value);
-                }
-            }
-        }
-
-        return Array.from(possibleValues);
-    }
-
-    autoPencilBoard() {
-        for (let row = 0; row < 9; row++) {
-            for (let col = 0; col < 9; col++) {
-                const cell = this.board[row][col];
-                if (cell.value === null) {
-                    const possibleValues = this.getPossibleValues(row, col);
-                    cell.hints = possibleValues.map(value => ({ value, createdBy: "system" }));
-                }
-            }
-        }
-    }
-
-    autoSolveBoard(): MoveContext {
-        for (let row = 0; row < 9; row++) {
-            for (let col = 0; col < 9; col++) {
-                const cell = this.board[row][col];
-                if (cell.value === null) {
-                    cell.value = this.puzzle.solution[row][col];
-                    cell.createdBy = "system";
-                    cell.hints = [];
-                }
-            }
-        }
-        return this.visibleState() as MoveContext;
-    }
-
-    closeGame(): MoveContext {
-        this.gameState = GameStates.GameOver;
         return this.visibleState() as MoveContext;
     }
 

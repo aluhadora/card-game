@@ -8,6 +8,7 @@ export type Participant = {
 }
 
 export interface Game {
+    allowLateJoin(): boolean;
     players: Record<string, unknown>;
     visibleState(extraData?: Record<string, unknown>): Record<string, unknown>;
     playerMove(data: BasePlayerMovePayload): Record<string, unknown> | undefined;
