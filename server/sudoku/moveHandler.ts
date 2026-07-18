@@ -1,181 +1,17 @@
 import { GameStates, MoveTypes } from "./constants";
+import clearCell from "./moves/clearCell";
+import setCellValue from "./moves/setCellValue";
+import toggleHint from "./moves/toggleHint";
+import clearHintMove from "./moves/clearHint";
+import addHintMove from "./moves/addHint";
+import newBoardMove from "./moves/newBoard";
+import closeGameMove from "./moves/closeGame";
+import autoFillPencilHintsMove from "./moves/autoFillPencilHints";
+import autoSolveMove from "./moves/autoSolve";
+import checkAnswers from "./moves/checkAnswers";
 import MoveValidator from "./moveValidator";
-import { Cell, MoveContext, MoveData } from "./types";
-
-
-function clearCell(moveData: MoveData, context: MoveContext): MoveContext {
-    const [row, col] = moveData.cellAddress;
-    const cell = context.board[row][col];
-
-    if (cell.value !== null) {
-        cell.value = null;
-        cell.createdBy = null;
-    } else {
-        cell.hints = [];
-    }
-
-    return context;
-}
-
-function setCellValue(moveData: MoveData, context: MoveContext): MoveContext {
-    const [row, col] = moveData.cellAddress;
-    const cell = context.board[row][col];
-
-    cell.value = moveData.value;
-    cell.createdBy = moveData.playerId;
-
-    // Clear hints of this value from row, column, and 3x3 group
-    const value = moveData.value;
-
-    // Clear from row
-    for (let c = 0; c < 9; c++) {
-        clearHint(context.board[row][c], value);
-    }
-
-    // Clear from column
-    for (let r = 0; r < 9; r++) {
-        clearHint(context.board[r][col], value);
-    }
-
-    // Clear from 3x3 group
-    const groupRow = Math.floor(row / 3) * 3;
-    const groupCol = Math.floor(col / 3) * 3;
-    for (let r = groupRow; r < groupRow + 3; r++) {
-        for (let c = groupCol; c < groupCol + 3; c++) {
-            clearHint(context.board[r][c], value);
-        }
-    }
-
-    return context;
-}
-
-function clearHint(cell: Cell, value: number | null) {
-    if (value === null || value === 0 || value === undefined) {
-        cell.hints = [];
-    } else {
-        const existingHintIndex = cell.hints.findIndex(hint => hint.value === value);
-        if (existingHintIndex !== -1) {
-            cell.hints.splice(existingHintIndex, 1);
-        }
-    }
-}
-
-function clearHintMove(moveData: MoveData, context: MoveContext): MoveContext {
-    const [row, col] = moveData.cellAddress;
-    const cell = context.board[row][col];
-    clearHint(cell, moveData.value);
-    return context;
-}
-
-function addHintMove(moveData: MoveData, context: MoveContext): MoveContext {
-    const [row, col] = moveData.cellAddress;
-    const cell = context.board[row][col];
-    if (allowAddHint(moveData.cellAddress, moveData.value!, context)) {
-        addHint(cell, moveData.value!, moveData.playerId);
-    }
-    return context;
-}
-
-function allowAddHint(cellAddress: [number, number], value: number, context: MoveContext): boolean {
-    // Check if value exists in row
-    const [row, col] = cellAddress;
-    for (let c = 0; c < 9; c++) {
-        if (context.board[row][c].value === value) {
-            return false;
-        }
-    }
-
-    // Check if value exists in column
-    for (let r = 0; r < 9; r++) {
-        if (context.board[r][col].value === value) {
-            return false;
-        }
-    }
-
-    // Check if value exists in 3x3 group
-    const groupRow = Math.floor(row / 3) * 3;
-    const groupCol = Math.floor(col / 3) * 3;
-    for (let r = groupRow; r < groupRow + 3; r++) {
-        for (let c = groupCol; c < groupCol + 3; c++) {
-            if (context.board[r][c].value === value) {
-                return false;
-            }
-        }
-    }
-
-    return true;
-}
-
-function addHint(cell: Cell, value: number, playerId: string) {
-    // Check if value already exists in hints
-    const existingHintIndex = cell.hints.findIndex(hint => hint.value === value && hint.createdBy === playerId);
-    if (existingHintIndex === -1) {
-        cell.hints.push({ value: value, createdBy: playerId });
-    }
-}
-
-function toggleHint(moveData: MoveData, context: MoveContext): MoveContext {
-    const [row, col] = moveData.cellAddress;
-    const cell = context.board[row][col];
-
-    const existingHintIndex = cell.hints.findIndex(hint => hint.value === moveData.value);
-    if (existingHintIndex !== -1) {
-
-        cell.hints.splice(existingHintIndex, 1);
-    } else {
-        const value = moveData.value!;
-
-        // Check if value exists in row
-        let valueInRow = false;
-        for (let c = 0; c < 9; c++) {
-            if (context.board[row][c].value === value) {
-                valueInRow = true;
-                break;
-            }
-        }
-
-        // Check if value exists in column
-        let valueInCol = false;
-        for (let r = 0; r < 9; r++) {
-            if (context.board[r][col].value === value) {
-                valueInCol = true;
-                break;
-            }
-        }
-
-        // Check if value exists in 3x3 group
-        let valueInGroup = false;
-        const groupRow = Math.floor(row / 3) * 3;
-        const groupCol = Math.floor(col / 3) * 3;
-        for (let r = groupRow; r < groupRow + 3; r++) {
-            for (let c = groupCol; c < groupCol + 3; c++) {
-                if (context.board[r][c].value === value) {
-                    valueInGroup = true;
-                    break;
-                }
-            }
-            if (valueInGroup) break;
-        }
-
-        // Only push hint if value doesn't exist in row, column, or group
-        if (!valueInRow && !valueInCol && !valueInGroup) {
-            cell.hints.push({ value: value, createdBy: moveData.playerId });
-        }
-
-    }
-
-    return context;
-}
-
-function newBoardMove(_moveData: MoveData, context: MoveContext): MoveContext {
-    console.log("Creating new board...");
-    return context.newBoard();
-}
-
-function closeGameMove(_moveData: MoveData, context: MoveContext): MoveContext {
-    console.log("Move -- Closing game...");
-    return { ...context, gameState: GameStates.GameOver };
-}
+import { MoveContext, MoveData } from "./types";
+import clearBoard from "./moves/clearBoard";
 
 export default class MoveHandler {
     moveValidator: MoveValidator;
@@ -193,6 +29,8 @@ export default class MoveHandler {
         this.moveDictionary[MoveTypes.CloseGame] = closeGameMove;
         this.moveDictionary[MoveTypes.AutoFillPencilHints] = autoFillPencilHintsMove;
         this.moveDictionary[MoveTypes.AutoSolve] = autoSolveMove;
+        this.moveDictionary[MoveTypes.CheckAnswers] = checkAnswers;
+        this.moveDictionary[MoveTypes.ClearBoard] = clearBoard;
     }
 
     handleMove(moveData: MoveData, context: MoveContext): MoveContext | undefined {
@@ -205,68 +43,3 @@ export default class MoveHandler {
     }
 }
 
-function autoFillPencilHintsMove(_moveData: MoveData, context: MoveContext): MoveContext {
-    if (!context.settings?.allowAutoPencil) {
-        return context;
-    }
-
-    for (let row = 0; row < 9; row++) {
-        for (let col = 0; col < 9; col++) {
-            const cell = context.board[row][col];
-            if (cell.value === null) {
-                const possibleValues = getPossibleValues(row, col, context);
-                cell.hints = possibleValues.map(value => ({ value, createdBy: "system" }));
-            }
-        }
-    }
-
-    return context;
-}
-
-function getPossibleValues(row: number, col: number, context: MoveContext): number[] {
-    const possibleValues = new Set<number>([1, 2, 3, 4, 5, 6, 7, 8, 9]);
-
-    // Remove values from the same row
-    for (let c = 0; c < 9; c++) {
-        const value = context.board[row][c].value;
-        if (value !== null) {
-            possibleValues.delete(value);
-        }
-    }
-
-    for (let r = 0; r < 9; r++) {
-        const value = context.board[r][col].value;
-        if (value !== null) {
-            possibleValues.delete(value);
-        }
-    }
-
-    const groupRow = Math.floor(row / 3) * 3;
-    const groupCol = Math.floor(col / 3) * 3;
-
-    for (let r = groupRow; r < groupRow + 3; r++) {
-        for (let c = groupCol; c < groupCol + 3; c++) {
-            const value = context.board[r][c].value;
-            if (value !== null) {
-                possibleValues.delete(value);
-            }
-        }
-    }
-
-    return Array.from(possibleValues);
-}
-
-function autoSolveMove(_moveData: MoveData, context: MoveContext): MoveContext {
-    for (let row = 0; row < 9; row++) {
-        for (let col = 0; col < 9; col++) {
-            const cell = context.board[row][col];
-            if (cell.value === null) {
-                cell.value = context.puzzleSolution[row][col];
-                cell.createdBy = "system";
-                cell.hints = [];
-            }
-        }
-    }
-
-    return context;
-}

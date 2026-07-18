@@ -1,6 +1,6 @@
 import { GameSettings } from "../../components/types";
 import { GameType } from "../../constants";
-import { DifficultyLevel, MoveType, GameState, GameMode } from "./constants";
+import { DifficultyLevel, MoveType, GameState, GameMode, ConfirmedStatus } from "./constants";
 
 export type Hint = {
     value: number;
@@ -10,7 +10,7 @@ export type Hint = {
 export type Cell = {
     value: number | null;
     readonly: boolean;
-    confirmed: boolean;
+    confirmed: ConfirmedStatus | unknown | null;
     hints: Hint[];
     createdBy: string | null;
 };

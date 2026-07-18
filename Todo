@@ -5,18 +5,10 @@ Connection Screen:
 
 Sudoku:
     Kallie's app is "Sudoku Joy"
-    Advance to next number when completing a number
-    Option to show how many more of given number
-    Lightning mode on by default
 
     Implement "lives mode"
-    Implement game finished
     Implement timer
     Implement "versus" mode
         I think multiple
             Lives mode
             Only find out when game finished
-    Implement options:
-        Allow auto pencil
-        Difficulty
-    Mid game join

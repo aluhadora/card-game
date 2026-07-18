@@ -109,15 +109,7 @@ export default function OptionsDrawer({
                         label="Lightning Mode"
                     />
                     <button
-                        style={{
-                            padding: "10px",
-                            cursor: "pointer",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "8px",
-                            width: "235px",
-                            marginLeft: "10px",
-                        }}
+                        className={styles.optionButton}
                         onClick={() => {
                             playerMove({
                                 moveType: MoveTypes.AutoFillPencilHints,
@@ -135,15 +127,20 @@ export default function OptionsDrawer({
                         <span>Auto fill pencil hints</span>
                     </button>
                     <button
-                        style={{
-                            padding: "10px",
-                            cursor: "pointer",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "8px",
-                            width: "235px",
-                            marginLeft: "10px",
+                        className={styles.optionButton}
+                        onClick={() => {
+                            playerMove({
+                                moveType: MoveTypes.ClearBoard,
+                                cellAddress: [0, 0],
+                                value: null,
+                                playerId: playerId,
+                            });
                         }}
+                    >
+                        <span>Clear Board</span>
+                    </button>
+                    <button
+                        className={styles.optionButton}
                         onClick={() => {
                             playerMove({
                                 moveType: MoveTypes.AutoSolve,
@@ -154,6 +151,32 @@ export default function OptionsDrawer({
                         }}
                     >
                         <span>Auto solve board</span>
+                    </button>
+                    <button
+                        className={styles.optionButton}
+                        onClick={() => {
+                            playerMove({
+                                moveType: MoveTypes.CheckAnswers,
+                                cellAddress: [0, 0],
+                                value: null,
+                                playerId: playerId,
+                            });
+                        }}
+                    >
+                        <span>Check Answers</span>
+                    </button>
+                    <button
+                        className={styles.optionButton}
+                        onClick={() => {
+                            playerMove({
+                                moveType: MoveTypes.ClearBoard,
+                                cellAddress: [0, 0],
+                                value: null,
+                                playerId: playerId,
+                            });
+                        }}
+                    >
+                        <span>Clear Board</span>
                     </button>
                     <FormControlLabel
                         className={styles.optionCheckbox}

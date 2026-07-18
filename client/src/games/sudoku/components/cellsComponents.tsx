@@ -4,6 +4,7 @@ import { SudokuGameState } from "./sudoku";
 import styles from "./cellsComponents.module.css";
 import { CellHint } from "./cellHints";
 import { useEffect, useState } from "react";
+import { ConfirmedStatus } from "../constants";
 
 export type CellProps = {
     inputProps: InputHandlerProps;
@@ -119,6 +120,7 @@ function isCellNeighbor(
     );
 }
 function determineCellForegroundColor(cell: Cell, playerId: string): string {
+    if (cell.confirmed === ConfirmedStatus.Incorrect) return "red";
     const isCreatedByCurrentPlayer = cell.createdBy === playerId; // this gets replaced by player.color
     return isCreatedByCurrentPlayer ? "blue" : "green";
 }
@@ -142,6 +144,7 @@ function determineCellBackgroundColor(
         cellAddress,
     );
 
+    if (cell.confirmed === ConfirmedStatus.Incorrect) return "lightcoral";
     if (cellSelected) return "lightblue";
     if (cell.value !== null && inputProps.selectedNumber === cell.value)
         return "lightblue";
@@ -230,7 +233,7 @@ function CellBase({
             onPointerDown={handleMouseDown}
             onPointerUp={mouseUp}
             onPointerEnter={mouseEnter}
-            className={`${styles.cell} ${showGroupFinished ? styles.groupFinished : ""}`}
+            className={`${styles.cell} ${showGroupFinished ? styles.groupFinished : ""} ${cell.confirmed === "Incorrect" ? styles.incorrectCell : ""}`}
         >
             <div style={innerCellStyle}>{children}</div>
         </div>

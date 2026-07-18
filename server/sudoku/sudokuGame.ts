@@ -54,7 +54,7 @@ export default class SudokuGame implements Game {
     }
 
     handleGameFinished(context: MoveContext): MoveContext {
-        if (this.gameState === GameStates.GameOver) {
+        if (context.gameState === GameStates.GameOver) {
             return context;
         }
 

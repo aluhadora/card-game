@@ -1,5 +1,5 @@
 import { BasePlayerMovePayload, Player, StartGamePayload } from "../types";
-import { DifficultyLevel, GameMode, GameState, MoveType } from "./constants";
+import { ConfirmedStatus, DifficultyLevel, GameMode, GameState, MoveType } from "./constants";
 
 export type Hint = {
     value: number;
@@ -15,7 +15,7 @@ export type Puzzle = {
 export type Cell = {
     value: number | null;
     readonly: boolean;
-    confirmed: boolean;
+    confirmed: ConfirmedStatus | unknown | null;
     hints: Hint[];
     createdBy: string | null;
 }

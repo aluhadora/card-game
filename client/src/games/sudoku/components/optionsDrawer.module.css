@@ -39,7 +39,8 @@
         background-color 0.3s ease,
         color 0.3s ease;
     overflow-y: auto;
-    touch-action: none; /* Prevents pinch-zoom and double-tap zoom */
+    touch-action: none;
+    /* Prevents pinch-zoom and double-tap zoom */
     user-select: none;
 }
 
@@ -70,6 +71,7 @@
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -83,4 +85,14 @@
     border-radius: 10px;
     /* background-color: lightblue; Change this as needed */
     /* color: black; Change this as needed */
+}
+
+.optionButton {
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 235px;
+    margin-left: 10px;
 }

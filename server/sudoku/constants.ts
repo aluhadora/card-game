@@ -9,6 +9,8 @@ export const MoveTypes = {
     CloseGame: "CloseGame",
     AutoFillPencilHints: "AutoFillPencilHints",
     AutoSolve: "AutoSolve",
+    CheckAnswers: "CheckAnswers",
+    ClearBoard: "ClearBoard",
 } as const;
 
 export type MoveType = typeof MoveTypes[keyof typeof MoveTypes];
@@ -38,3 +40,11 @@ export const GameModes = {
 } as const;
 
 export type GameMode = (typeof GameModes)[keyof typeof GameModes];
+
+export const ConfirmedStatus = {
+    Confirmed: "Confirmed",
+    Unconfirmed: "Unconfirmed",
+    Incorrect: "Incorrect",
+} as const;
+
+export type ConfirmedStatus = (typeof ConfirmedStatus)[keyof typeof ConfirmedStatus];
