@@ -118,6 +118,23 @@ function FinaleFanfare({ gameState }: { gameState: SudokuGameState }) {
     );
 }
 
+function getSettingFromLocalStorage<T>(key: string, defaultValue: T): T {
+    const storedValue = localStorage.getItem(key);
+    if (storedValue === null) {
+        return defaultValue;
+    }
+    try {
+        return JSON.parse(storedValue) as T;
+    }
+    catch {
+        return defaultValue;
+    }
+}
+
+function setAndPersistSettingInLocalStorage<T>(key: string, value: T): void {
+    localStorage.setItem(key, JSON.stringify(value));
+}
+
 export default function Sudoku({
     gameState,
     playerId,
@@ -129,14 +146,14 @@ export default function Sudoku({
     // Standard Hint: Player selects a cell, then either types a number, or clicks it in the number row to add a hint
     // Lightning Hint: Player selects a number, then clicks a cell to add a hint
     const [inputMode, setInputMode] = useState<InputMode>(
-        (localStorage.getItem("sudoku_inputMode") as InputMode) ??
-            InputMode.Standard,
+        getSettingFromLocalStorage("sudoku_inputMode", InputMode.Standard)
     );
 
     const setAndPersistInputMode = (mode: InputMode) => {
-        localStorage.setItem("sudoku_inputMode", mode);
+        setAndPersistSettingInLocalStorage("sudoku_inputMode", mode);
         setInputMode(mode);
     };
+
     const [selectedNumber, setSelectedNumber] = useState<number | null>(null);
     const [selectedCell, setSelectedCell] = useState<[number, number] | null>(
         null,
@@ -147,6 +164,14 @@ export default function Sudoku({
     const [dragging, setDragging] = useState<boolean>(false);
     const [dragClearing, setDragClearing] = useState<boolean>(false);
     const [lastMove, setLastMove] = useState<MoveData | null>(null);
+    const [showRemainingNumbers, setShowRemainingNumbers] = useState<boolean>(
+        getSettingFromLocalStorage("sudoku_showRemainingNumbers", true)
+    );
+
+    const setAndPersistShowRemainingNumbers = (show: boolean) => {
+        setAndPersistSettingInLocalStorage("sudoku_showRemainingNumbers", show);
+        setShowRemainingNumbers(show);
+    }
 
     const handlePlayerMove = (move: MoveData) => {
         setLastMove(move);
@@ -170,6 +195,8 @@ export default function Sudoku({
         setDragging,
         dragClearing,
         setDragClearing,
+        showRemainingNumbers,
+        setShowRemainingNumbers: setAndPersistShowRemainingNumbers,
         inputHandler: inputHandler,
     };
 
@@ -285,6 +312,7 @@ export default function Sudoku({
                                 gameState={gameState}
                                 playerMove={handlePlayerMove}
                                 playerId={playerId}
+                                showRemainingNumbers={showRemainingNumbers}
                             />
                         </div>
                     </div>

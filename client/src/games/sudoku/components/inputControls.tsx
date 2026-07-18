@@ -148,11 +148,13 @@ export function NumberRow({
     playerMove,
     playerId,
     gameState,
+    showRemainingNumbers,
 }: {
     inputProps: InputHandlerProps;
     playerMove: (move: MoveData) => void;
     playerId: string;
     gameState: SudokuGameState;
+    showRemainingNumbers: boolean;
 }) {
     if (gameState.gameState === GameStates.Completed) return null;
     const isLightningMode =
@@ -200,13 +202,17 @@ export function NumberRow({
                                     number
                                 )}
                             </div>
-                            <div style={{ fontSize: "9px" }}>
-                                {9 -
-                                    gameState.board
-                                        .flat()
+                            {
+                                showRemainingNumbers && number !== 0 && (
+                                    <div style={{ fontSize: "9px" }}>
+                                        {9 -
+                                            gameState.board
+                                                .flat()
                                         .filter((cell) => cell.value === number)
                                         .length}
-                            </div>
+                                    </div>
+                                )
+                            }
                         </div>
                     </button>
                 ))}

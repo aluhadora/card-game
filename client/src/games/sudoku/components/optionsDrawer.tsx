@@ -155,6 +155,19 @@ export default function OptionsDrawer({
                     >
                         <span>Auto solve board</span>
                     </button>
+                    <FormControlLabel
+                        className={styles.optionCheckbox}
+                        style={{
+                            marginLeft: "10px",
+                        }}
+                        control={
+                            <Checkbox
+                                checked={inputProps.showRemainingNumbers}
+                                onChange={e => inputProps.setShowRemainingNumbers(e.target.checked)}
+                            />
+                        }
+                        label="Show Remaining of Numbers"
+                    />
                 </div>
             </div>
         </>

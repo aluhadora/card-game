@@ -3,6 +3,7 @@ import { Cell, MoveData } from "../types";
 import { SudokuGameState } from "./sudoku";
 import styles from "./cellsComponents.module.css";
 import { CellHint } from "./cellHints";
+import { useEffect, useState } from "react";
 
 export type CellProps = {
     inputProps: InputHandlerProps;
@@ -168,7 +169,19 @@ function CellBase({
     cellStyle?: React.CSSProperties;
     children?: React.ReactNode;
 }) {
+    const [showGroupFinished, setShowGroupFinished] = useState(false);
     const cellSelected = isCellMatch(inputProps.selectedCell, cellAddress);
+
+    useEffect(() => {
+        if (!showGroupFinished) return;
+
+        const timer = setTimeout(() => {
+            setShowGroupFinished(false);
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, [showGroupFinished]);
+
 
     const style = {
         ...(cellStyle ?? {}),
@@ -217,7 +230,7 @@ function CellBase({
             onPointerDown={handleMouseDown}
             onPointerUp={mouseUp}
             onPointerEnter={mouseEnter}
-            className={styles.cell}
+            className={`${styles.cell} ${showGroupFinished ? styles.groupFinished : ""}`}
         >
             <div style={innerCellStyle}>{children}</div>
         </div>

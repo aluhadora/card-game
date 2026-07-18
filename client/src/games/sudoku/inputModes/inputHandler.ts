@@ -19,6 +19,8 @@ export type InputHandlerProps = {
     setDragging: (dragging: boolean) => void;
     dragClearing: boolean;
     setDragClearing: (dragClearing: boolean) => void;
+    showRemainingNumbers: boolean;
+    setShowRemainingNumbers: (show: boolean) => void;
     inputHandler: InputModeStrategyHandler;
 };
 
