@@ -15,11 +15,15 @@ export default function declineSelected({ player }: MoveData, { actions, gameSta
         actions.advancePlayer();
     }
 
+    // The card was already face-up in the selected slot; slide it straight
+    // to the discard pile.
     return {
         delta: {
             from: `p${player.id}-selected`,
             to: `discard-pile`,
-            card: discards.slice(-1)[0]
+            card: discards.slice(-1)[0],
+            type: "translate",
+            duration: 700
         }
     };
 }

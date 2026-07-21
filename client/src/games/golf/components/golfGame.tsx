@@ -10,7 +10,10 @@ export type GolfGameProps = {
     playerMove: (move: MoveData) => void;
     playerId: string;
     animationDeltas?: Array<AnimationDelta> | null;
-    setAnimationDeltas?: (deltas: Array<AnimationDelta>) => void;
+    setAnimationDeltas?: React.Dispatch<
+        React.SetStateAction<Array<AnimationDelta>>
+    >;
+    applyPendingState?: () => void;
 };
 
 const RENDER_3D_KEY = "golf_render3d";

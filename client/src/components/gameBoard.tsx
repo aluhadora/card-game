@@ -12,7 +12,10 @@ type GameBoardProps = {
     playerMove: (move: MoveData) => void;
     started: boolean;
     animationDeltas?: Array<AnimationDelta> | null;
-    setAnimationDeltas?: (deltas: Array<AnimationDelta>) => void;
+    setAnimationDeltas?: React.Dispatch<
+        React.SetStateAction<Array<AnimationDelta>>
+    >;
+    applyPendingState?: () => void;
 };
 
 export default function GameBoard({
@@ -22,6 +25,7 @@ export default function GameBoard({
     started,
     animationDeltas,
     setAnimationDeltas,
+    applyPendingState,
 }: GameBoardProps) {
     if (!started) return null;
 
@@ -37,6 +41,7 @@ export default function GameBoard({
                 playerId={playerId}
                 animationDeltas={animationDeltas}
                 setAnimationDeltas={setAnimationDeltas}
+                applyPendingState={applyPendingState}
             />
         );
     } else if (state.gameType === GameTypes.Garbage) {

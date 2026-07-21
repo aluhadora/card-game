@@ -26,7 +26,10 @@ type GolfProps = {
     playerMove: (move: MoveData) => void;
     playerId: string;
     animationDeltas?: Array<AnimationDelta> | null;
-    setAnimationDeltas?: (deltas: Array<AnimationDelta>) => void;
+    setAnimationDeltas?: React.Dispatch<
+        React.SetStateAction<Array<AnimationDelta>>
+    >;
+    applyPendingState?: () => void;
 };
 
 function isActive(gameState: GameState, playerId: string): boolean {
@@ -101,6 +104,7 @@ export default function Golf3d({
     playerId,
     animationDeltas,
     setAnimationDeltas,
+    applyPendingState,
 }: GolfProps) {
     if (!gameState) return;
 
@@ -146,13 +150,18 @@ export default function Golf3d({
                         position={[-5, 5, 0]}
                         discardPile={gameState?.discardPile || []}
                         discardClick={() =>
-                            discardClick(gameState!, playerMove, null)
+                            discardClick(
+                                gameState!,
+                                playerMove,
+                                sortedPlayers[0].selectedCard,
+                            )
                         }
                     />
                     {setAnimationDeltas && (
                         <AnimationHandler3d
                             animationDeltas={animationDeltas ?? []}
                             setAnimationDeltas={setAnimationDeltas}
+                            applyPendingState={applyPendingState}
                         />
                     )}
                     {/* <OrbitControls /> */}

@@ -63,6 +63,7 @@ export default function PlayerArea({
                     position={slotPos}
                     cardData={player.playArea[index] || null}
                     cardClick={() => cardClick(index)}
+                    anchorId={`p${player.id}-${index}`}
                 />,
             );
         }
@@ -93,6 +94,7 @@ export default function PlayerArea({
                 <CardComponent
                     position={selectedPos}
                     cardData={selectedCard}
+                    anchorId={`p${player.id}-selected`}
                 />
             )}
         </group>

@@ -24,7 +24,15 @@ export function CardPile({
     const topPos: [number, number, number] = [position[0], position[1], topZ];
 
     return (
-        <group onClick={discardClick}>
+        <group
+            onClick={(e) => {
+                // R3F fires the group's onClick once per raycast hit
+                // inside it, so a click on the pile that also touches the
+                // top-card mesh would otherwise dispatch the move twice.
+                e.stopPropagation();
+                discardClick();
+            }}
+        >
             <mesh receiveShadow position={position}>
                 <meshStandardMaterial map={baseTexture} />
                 <boxGeometry args={[2, 3, 0.05 * discardPile.length]} />
@@ -34,6 +42,7 @@ export function CardPile({
                 <CardComponent
                     position={topPos}
                     cardData={discardPile[discardPile.length - 1]}
+                    anchorId="discard-pile"
                 />
             )}
         </group>

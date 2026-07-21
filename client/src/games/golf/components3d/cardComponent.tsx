@@ -1,71 +1,61 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import * as THREE from "three";
 import { CardData } from "../../common/types";
-import { useFrame } from "@react-three/fiber";
 import { getCardTexture } from "./cardTextureCache";
+import { useIsAnchorBusy } from "./animationRegistry";
 
 export type CardProps = {
     position?: [number, number, number];
     cardData: CardData | null;
     cardClick?: () => void;
+    /**
+     * When set, this card hides itself while the named anchor is in the
+     * animation handler's busy set — i.e. while an overlay is currently
+     * playing an animation to/from this anchor. Prevents the static
+     * steady-state card from ghosting behind the animated overlay.
+     */
+    anchorId?: string;
 };
 
-function flippingAnimation(
-    delta: number,
-    rotation: [number, number, number],
-    setRotation: React.Dispatch<React.SetStateAction<[number, number, number]>>,
-    active: boolean,
-) {
-    const setYRotation = (newY: number) => {
-        setRotation(([x, _y, z]) => [x, newY, z]);
-    };
-
-    if (active && rotation[1] < Math.PI) {
-        setYRotation(rotation[1] + delta * 5);
-    } else if (!active && rotation[1] > 0) {
-        setYRotation(rotation[1] - delta * 5);
-    } else {
-        setYRotation(active ? Math.PI : 0);
-    }
-}
-
-export function CardComponent({ position, cardData, cardClick }: CardProps) {
+/**
+ * A static card mesh anchored to a slot. The card face angle is derived
+ * directly from `cardData` so the component snaps to the correct
+ * orientation whenever the data changes — no local flip animation, no
+ * post-commit rotation sync that could flash the wrong texture for a
+ * frame.
+ *
+ * All reveal/translate/flip motion for cards is played by
+ * `AnimationHandler3d` as short-lived overlay meshes that render in front
+ * of these static ones and hand off silently when they finish.
+ */
+export function CardComponent({
+    position,
+    cardData,
+    cardClick,
+    anchorId,
+}: CardProps) {
     const meshRef = useRef<THREE.Mesh>(null);
     const [hovered, setHover] = useState(false);
-    const [active, setActive] = useState(cardData !== null);
-    const [rotation, setRotation] = useState<[number, number, number]>([
-        0, 0, 0,
-    ]);
+    const busy = useIsAnchorBusy(anchorId);
+
     const texturePath = cardData?.name
         ? `/images/cards/${cardData.name}.png`
         : "/images/cards/card-base.png";
     const texture = getCardTexture(texturePath);
     const baseTexture = getCardTexture("/images/cards/back.png");
 
-    // Keep the flip state in sync with whatever card data is currently
-    // assigned to this slot. Without this, when the server pushes a state
-    // where the slot transitions from empty (null) to a real card, `active`
-    // stays false and the card never flips face-up — the animated overlay
-    // finishes and the underlying card sits face-down, which looks like
-    // the screen "flashed" past the reveal.
-    useEffect(() => {
-        setActive(cardData !== null);
-    }, [cardData]);
-
-    useFrame((_state, delta) =>
-        flippingAnimation(delta, rotation, setRotation, active),
-    );
+    const rotation: [number, number, number] = cardData
+        ? [0, Math.PI, 0]
+        : [0, 0, 0];
 
     return (
         <mesh
             position={position}
             rotation={rotation}
+            visible={!busy}
             onPointerOver={() => setHover(true)}
             onPointerOut={() => setHover(false)}
-            onClick={() => {
-                cardClick?.();
-            }}
-            // scale={active ? 1.5 : 1}
+            onClick={() => cardClick?.()}
             ref={meshRef}
             castShadow
         >

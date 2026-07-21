@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import "./App.css";
 import io from "socket.io-client";
 import ConnectionManager from "./components/connectionManager";
@@ -32,6 +32,22 @@ export default function App() {
     };
 
     const [animationDeltas, setAnimationDeltas] = useState([]);
+
+    // Holds the newest server state that's waiting for an animation batch
+    // to finish before it's committed to the visible game state. The
+    // AnimationHandler calls `applyPendingState` at the moment its last
+    // overlay unmounts, which lets React batch (state commit + busy
+    // clear + overlay removal) into one paint — no flash-of-old-data at
+    // the animation hand-off.
+    const pendingStateRef = useRef(null);
+
+    const applyPendingState = () => {
+        if (pendingStateRef.current) {
+            const s = pendingStateRef.current;
+            pendingStateRef.current = null;
+            setDeltas([s]);
+        }
+    };
 
     const addPlayer = (playerData) => {
         setMessages((messages) => [...messages, { playerJoined: playerData }]);
@@ -129,17 +145,40 @@ export default function App() {
         setDeltas([state]);
     };
 
+    // Compound animations may span multiple delayed steps, so the state
+    // hand-off has to wait for the longest (delay + duration) in the batch
+    // rather than the single global `animationTime`.
+    const batchDurationMs = (deltas) =>
+        deltas.reduce(
+            (max, d) =>
+                Math.max(max, (d.delay || 0) + (d.duration || animationTime)),
+            animationTime,
+        );
+
+    // Safety fallback: if the AnimationHandler doesn't drive the state
+    // apply (e.g. the 2D golf renderer, which has no handler mounted),
+    // this ensures we still commit the pending state after the animation
+    // budget elapses. `applyPendingState` is idempotent so the handler-
+    // driven path takes precedence when it fires first.
+    const FALLBACK_MARGIN_MS = 200;
+
     const playerMoved = (state) => {
         if (state.delta) {
             console.log("Handling animation delta:", state.delta);
+            pendingStateRef.current = state;
             setAnimationDeltas((deltas) => [...deltas, state.delta]);
-            setTimeout(() => setState(state), animationTime + 50);
+            setTimeout(
+                applyPendingState,
+                batchDurationMs([state.delta]) + FALLBACK_MARGIN_MS,
+            );
         } else if (state.deltas) {
             console.log("Handling multiple deltas:", state.deltas);
+            pendingStateRef.current = state;
             setAnimationDeltas((deltas) => [...deltas, ...state.deltas]);
-            // Deltas within a batch now play in parallel, so timing is
-            // constant regardless of batch size.
-            setTimeout(() => setState(state), animationTime + 50);
+            setTimeout(
+                applyPendingState,
+                batchDurationMs(state.deltas) + FALLBACK_MARGIN_MS,
+            );
         } else {
             setState(state); // Store the new state
         }
@@ -198,6 +237,7 @@ export default function App() {
                         started={started}
                         animationDeltas={animationDeltas}
                         setAnimationDeltas={setAnimationDeltas}
+                        applyPendingState={applyPendingState}
                     />
                     {/* <AnimationHandler
                         animationDeltas={animationDeltas}
