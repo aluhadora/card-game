@@ -1,0 +1,39 @@
+Animation work
+    Opening move
+        Card flips over in place and reveals
+        This one kind of works, but is a little janky, it reveals the card, then switches back to the card back and /then/ flips
+
+    Selected card -> Unrevealed card
+        Selected card slides to neighbor the unrevealed card
+        Reveal unrevealed card (flip)
+        Selected card "pushes" the newly revealed card
+        the newly revealed card moves to the discard pile
+
+    Selected card -> Revealed card
+        Selected card slides to neighbor the card we're replacing
+        Selected card "pushes" the card formerly in that spot
+        The old card translates to the discard pile
+        This one actually is mostly okay now, it just translates both at the same timer
+
+
+    Select from deck
+        Card reveals in air while translating to selected card spot
+        This one right now spawns the new card face up both on top of the deck
+        and in the selected card position, then translates the card from the deck to the selected one
+
+
+    Select from discard pile
+        Card directly translates to selected card spot
+        Currently this does the same as "select from deck"
+
+
+    I think these are all compound animations 
+        Static Flipping
+        Flipping While translating
+        translating
+            Either to an unoccupied spot 
+            Or to an occupied spot triggering another compound animation of 
+                1. translate to neighbor spot
+                2. Maybe a reveal 
+                3. simultaneous translation of both cards (the "pushing")
+                4. the displaced card translates to discard pile

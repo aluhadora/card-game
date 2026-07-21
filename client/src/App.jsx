@@ -10,6 +10,7 @@ import useDeckPreloader from "./hooks/useDeckPreloader";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { useMediaQuery } from "@mui/material";
 import CssBaseline from "@mui/material/CssBaseline";
+import Golf3d from "./games/golf/components3d/golf";
 
 export default function App() {
     useDeckPreloader();
@@ -195,11 +196,13 @@ export default function App() {
                         state={deltas[0]}
                         playerId={playerId}
                         started={started}
-                    />
-                    <AnimationHandler
                         animationDeltas={animationDeltas}
                         setAnimationDeltas={setAnimationDeltas}
                     />
+                    {/* <AnimationHandler
+                        animationDeltas={animationDeltas}
+                        setAnimationDeltas={setAnimationDeltas}
+                    /> */}
                     <MessagesPanel
                         messages={messages}
                         sendMessage={sendMessage}

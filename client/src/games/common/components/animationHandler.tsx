@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
-import { animationTime } from "../../../logic/animationConfiguration";
 import { AnimationDelta } from "../types";
-import React from "react";
+import { animationTime } from "../../../logic/animationConfiguration";
 
 type AnimationHandlerProps = {
     animationDeltas: Array<AnimationDelta> | null;
@@ -47,7 +46,10 @@ function runDelta(delta: AnimationDelta, duration: number): Promise<void> {
         const toEl = document.getElementById(toId);
 
         if (!fromEl || !toEl) {
-            console.error("AnimationHandler: element not found", { from: fromId, to: toId });
+            console.error("AnimationHandler: element not found", {
+                from: fromId,
+                to: toId,
+            });
             resolve();
             return;
         }
@@ -77,7 +79,7 @@ function runDelta(delta: AnimationDelta, duration: number): Promise<void> {
                 // Material "standard" easing — accelerates out, decelerates in.
                 easing: "cubic-bezier(0.4, 0.0, 0.2, 1)",
                 fill: "forwards",
-            }
+            },
         );
 
         const cleanup = () => {
@@ -94,7 +96,10 @@ function runDelta(delta: AnimationDelta, duration: number): Promise<void> {
  * queued deltas in parallel. Any deltas that arrive while a batch is
  * running are picked up on the next tick.
  */
-export default function AnimationHandler({ animationDeltas, setAnimationDeltas }: AnimationHandlerProps) {
+export default function AnimationHandler({
+    animationDeltas,
+    setAnimationDeltas,
+}: AnimationHandlerProps) {
     const runningRef = useRef(false);
 
     useEffect(() => {
