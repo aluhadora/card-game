@@ -2,7 +2,7 @@ import { Canvas } from "@react-three/fiber";
 import PlayerArea from "./playerArea";
 import Base from "./base";
 import { Deck } from "./deck";
-import { Stats } from "@react-three/drei";
+import { OrbitControls, Stats } from "@react-three/drei";
 import { CardPile } from "./cardPile";
 import { GameState, MoveData, Player } from "../types";
 import { GameStates, MoveTypes } from "../constants";
@@ -98,6 +98,36 @@ function deckClick(
     });
 }
 
+function OtherPlayerAreas({
+    sortedPlayers,
+    setAnimationDeltas,
+    applyPendingState,
+}: {
+    sortedPlayers: Array<Player>;
+    setAnimationDeltas?: React.Dispatch<
+        React.SetStateAction<Array<AnimationDelta>>
+    >;
+    applyPendingState?: () => void;
+}) {
+    return (
+        <>
+            {sortedPlayers.slice(1).map((player, index) => (
+                <PlayerArea
+                    key={player.id}
+                    position={[10 + index * 10, 0, 0]}
+                    isUs={false}
+                    active={false}
+                    playerMove={() => {}}
+                    player={player}
+                    selectedCard={player.selectedCard}
+                    gameState={null as any}
+                    scale={0.6}
+                />
+            ))}
+        </>
+    );
+}
+
 export default function Golf3d({
     gameState,
     playerMove,
@@ -161,11 +191,17 @@ export default function Golf3d({
                         <AnimationHandler3d
                             animationDeltas={animationDeltas ?? []}
                             setAnimationDeltas={setAnimationDeltas}
+                            playerId={playerId}
                             applyPendingState={applyPendingState}
                         />
                     )}
                     {/* <OrbitControls /> */}
-                    <Stats />
+                    {/* <Stats /> */}
+                    <OtherPlayerAreas
+                        sortedPlayers={sortedPlayers}
+                        setAnimationDeltas={setAnimationDeltas}
+                        applyPendingState={applyPendingState}
+                    />
                 </AnimationRegistryProvider>
             </Canvas>
         </div>

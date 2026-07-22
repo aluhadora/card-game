@@ -17,6 +17,12 @@ type AnimationHandler3dProps = {
             | ((prev: Array<AnimationDelta>) => Array<AnimationDelta>),
     ) => void;
     /**
+     * The local player's id. Used to decide which anchors belong to
+     * "us" (rendered at scale 1) vs. another player's play area
+     * (rendered at scale 0.6 to match the shrunken `PlayerArea` group).
+     */
+    playerId: string;
+    /**
      * Called synchronously when the last overlay in a batch finishes.
      * The parent (`App`) has already stored the pending game state in a
      * ref by the time this fires, so calling this here batches the state
@@ -37,6 +43,8 @@ type ActiveAnim = {
     duration: number;
     /** Anchor IDs whose static cards should hide for this delta's window. */
     anchors: string[];
+    startScale?: number;
+    endScale?: number;
 };
 
 /** Approximates the CSS `cubic-bezier(0.4, 0.0, 0.2, 1)` easing. */
@@ -104,6 +112,16 @@ function AnimatedCard({ anim, onComplete }: AnimatedCardProps) {
             mesh.rotation.y = eased * Math.PI;
         }
 
+        if (
+            anim.startScale !== undefined &&
+            anim.endScale !== undefined &&
+            anim.startScale !== anim.endScale
+        ) {
+            mesh.scale.setScalar(
+                anim.startScale + (anim.endScale - anim.startScale) * eased,
+            );
+        }
+
         if (t >= 1) {
             doneRef.current = true;
             onComplete(anim.id, anim.anchors);
@@ -138,6 +156,30 @@ function AnimatedCard({ anim, onComplete }: AnimatedCardProps) {
 }
 
 /**
+ * Anchors on another player's play area render at 0.6 (matching the
+ * `<group scale={0.6}>` wrapper in `golf.tsx` for other players).
+ * Everything else — the deck, the discard pile, and our own play area —
+ * renders at scale 1.
+ *
+ * Player anchor IDs are of the form `p{playerId}-*` (e.g. `p42-3`,
+ * `p42-selected`, `p42-3-neighbor`). Shared anchors like `deck-card` and
+ * `discard-pile` are not player-prefixed.
+ */
+function scaleForAnchor(anchor: string, ourPlayerId: string): number {
+    if (anchor.startsWith(`p${ourPlayerId}-`)) return 1;
+    if (anchor.startsWith("p")) return 0.6;
+    return 1;
+}
+
+function startScale(anim: AnimationDelta, ourPlayerId: string): number {
+    return scaleForAnchor(anim.from, ourPlayerId);
+}
+
+function endScale(anim: AnimationDelta, ourPlayerId: string): number {
+    return scaleForAnchor(anim.to, ourPlayerId);
+}
+
+/**
  * Consumes queued animation deltas and plays them according to their
  * declared `type`, honouring per-delta `delay` and `duration` so the
  * server can describe compound choreographies (approach → flip → push).
@@ -158,6 +200,7 @@ function AnimatedCard({ anim, onComplete }: AnimatedCardProps) {
 export default function AnimationHandler3d({
     animationDeltas,
     setAnimationDeltas,
+    playerId,
     applyPendingState,
 }: AnimationHandler3dProps) {
     const registry = useAnimationRegistry();
@@ -209,6 +252,8 @@ export default function AnimationHandler3d({
                 startTime: now + delay,
                 duration,
                 anchors,
+                startScale: startScale(delta, playerId),
+                endScale: endScale(delta, playerId),
             });
 
             // Hide the static cards at this delta's endpoints only while
@@ -228,16 +273,14 @@ export default function AnimationHandler3d({
         consumedCountRef.current = animationDeltas.length;
 
         if (newActive.length === 0) {
-            setAnimationDeltas((prev) =>
-                prev.slice(consumedCountRef.current),
-            );
+            setAnimationDeltas((prev) => prev.slice(consumedCountRef.current));
             return;
         }
 
         runningRef.current = true;
         activeCountRef.current = newActive.length;
         setActive(newActive);
-    }, [animationDeltas, registry, setAnimationDeltas, markBusy]);
+    }, [animationDeltas, registry, setAnimationDeltas, markBusy, playerId]);
 
     const handleComplete = (id: number, anchors: string[]) => {
         // Clear busy for this delta's anchors and remove the overlay in the
@@ -264,11 +307,7 @@ export default function AnimationHandler3d({
     return (
         <>
             {active.map((a) => (
-                <AnimatedCard
-                    key={a.id}
-                    anim={a}
-                    onComplete={handleComplete}
-                />
+                <AnimatedCard key={a.id} anim={a} onComplete={handleComplete} />
             ))}
         </>
     );

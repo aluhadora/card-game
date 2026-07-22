@@ -42,9 +42,9 @@ export default function PlayerArea({
         playerMove({ moveType: MoveTypes.AcceptSelected, cardIndex: index });
     };
 
-    for (let i = 0; i < 3; i++) {
-        for (let j = 0; j < 3; j++) {
-            const index = i * 3 + j;
+    for (let j = 0; j < 3; j++) {
+        for (let i = 0; i < 3; i++) {
+            const index = j * 3 + i;
             const slotPos: [number, number, number] = [
                 -3 + i * 3,
                 1 - j * 4,
@@ -86,10 +86,7 @@ export default function PlayerArea({
                 <meshStandardMaterial color="white" />
                 <planeGeometry args={[2, 3]} />
             </mesh>
-            <AnchorPoint
-                id={`p${player.id}-selected`}
-                position={selectedPos}
-            />
+            <AnchorPoint id={`p${player.id}-selected`} position={selectedPos} />
             {selectedCard && (
                 <CardComponent
                     position={selectedPos}
